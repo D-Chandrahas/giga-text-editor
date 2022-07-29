@@ -1,5 +1,6 @@
 #include "functions.hpp"
 
+
 void print_menu(){
     attron(A_REVERSE);
     mvaddstr(OPN_FLD_1,0,"CTRL + O");
