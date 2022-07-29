@@ -1,2 +1,1 @@
-# giga-text-editor
-Work in progress..
+# Work in progress..
