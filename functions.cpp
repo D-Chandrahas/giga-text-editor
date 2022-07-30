@@ -50,18 +50,12 @@ void write_out(const std::string& filepath,const std::string& text){
 	getyx(stdscr, cur_y, cur_x);
 	const std::string& new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
 	if(!new_filepath.empty()){
-		add_btn('C',"Continue");
 		if(!writefile(new_filepath, text)){
-			print_inp_fld("Failed to Write File...");
+			ctn_btn("Failed to Write File...");
 		}
 		else{
-			print_inp_fld("File Written Successfully!");
+			ctn_btn("File Written Successfully!");
 		}
-		refresh();
-		int ch;
-		while((ch = getch()) != 3){}
-		remove_btn();
-		clr_inp_fld();
 	}
 	move(cur_y, cur_x);
 	refresh();
@@ -105,8 +99,7 @@ void clr_inp_fld(){
 
 std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,int u_ascii_lim,int max_len){
 	add_btn('C',"Cancel");
-	print_inp_fld(prompt);
-	print_inp_fld(inp,prompt.length());
+	print_inp_fld(prompt + inp);
 	attron(A_REVERSE);
 	int ch;
 	while((ch = getch()) != '\n'){
@@ -144,4 +137,27 @@ void print_inp_fld(const std::string& msg,int col){
 	return;
 }
 
-void readfile(const std::string& filepath, std::list<std::string>& text){}
+void readfile(const std::string& filepath, std::list<std::string>& text){
+	std::ifstream ifile(filepath);
+	if(!ifile){
+		ctn_btn("Failed to Open File: " + filepath);
+	}
+	std::string line;
+	while(!std::getline(ifile,line).eof()){
+		line += '\n';
+		text.push_back(line);
+	}
+	ifile.close();
+	return;
+}
+
+void ctn_btn(const std::string& prompt){
+	add_btn('C',"Continue");
+	print_inp_fld(prompt);
+	refresh();
+	int ch;
+	while((ch = getch()) != 3){}
+	remove_btn();
+	clr_inp_fld();
+	return;
+}

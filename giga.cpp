@@ -9,13 +9,13 @@ int main(int argc, char** argv){
 		filepath = argv[1];
 		readfile(filepath,text);
 	}
-	init();
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;
-	int lines_text = 100;
+	int lines_text = 0;
 	int cur_y_text = 0;
 	int cur_x_text = 0;
+	init();
 
 	while(TRUE){
 		ch = getch();

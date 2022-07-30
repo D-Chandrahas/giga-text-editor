@@ -36,5 +36,7 @@ void print_inp_fld(const std::string& msg,int col = 0);
 
 void readfile(const std::string& filepath, std::list<std::string>& text);
 
+void ctn_btn(const std::string& prompt);
+
 
 #endif
