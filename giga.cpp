@@ -1,16 +1,13 @@
-#include <ncurses.h>
-#include "functions.hpp"
-#include <string>
+#include "my_header.hpp"
+
+
+int LINES_TEXT = 0;
 
 
 
-int main(){
-	initscr();
-	noecho();
-	raw();
-	keypad(stdscr, TRUE);
-	print_menu();
-	move(0,0);
+int main(int argc, char** argv){
+
+	init();
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;

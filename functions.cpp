@@ -1,5 +1,17 @@
-#include "functions.hpp"
+#include "my_header.hpp"
 
+
+
+void init(){
+	initscr();
+	noecho();
+	raw();
+	keypad(stdscr, TRUE);
+	print_menu();
+	move(0,0);
+	refresh();
+	return;
+}
 
 void print_menu(){
     attron(A_REVERSE);
@@ -65,7 +77,9 @@ void goto_line(){
 		return;
 	}
 	int line_no = stoi(inp_line_no) - 1;
-	//if line_no out of range, move to last line
+	if(line_no >= LINES_TEXT){
+		line_no = LINES_TEXT - 1;
+	}
 	//scroll text
 	move(line_no % INP_FLD,0);
 	refresh();

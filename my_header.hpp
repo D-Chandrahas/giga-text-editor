@@ -1,17 +1,22 @@
-#ifndef FUNCTIONS_HPP
-#define FUNCTIONS_HPP
+#ifndef MY_HEADER_HPP
+#define MY_HEADER_HPP
 
 
 #include <ncurses.h>
 #include <string>
 #include <fstream>
+#include <list>
 
 
 #define INP_FLD (LINES-2)
 #define TEXT_Y_MAX (INP_FLD-1)
 #define OPN_FLD_1 (INP_FLD+1)
 
+extern int LINES_TEXT;
 
+
+
+void init();
 
 void print_menu();
 
