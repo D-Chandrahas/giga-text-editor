@@ -44,13 +44,14 @@ void remove_btn(){
 	return;
 }
 
-void write_out(const std::string& text){
+//change this to take list of strings and write to file
+void write_out(const std::string& filepath,const std::string& text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	const std::string& filename = take_inp("Enter Filename: ",32,126,100);
-	if(!filename.empty()){
+	const std::string& new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
+	if(!new_filepath.empty()){
 		add_btn('C',"Continue");
-		if(!writefile(filename, text)){
+		if(!writefile(new_filepath, text)){
 			print_inp_fld("Failed to Write File...");
 		}
 		else{
@@ -67,18 +68,19 @@ void write_out(const std::string& text){
 	return;
 }
 
-void goto_line(){
+void goto_line(int cur_line,int lines_text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	const std::string& inp_line_no = take_inp("Enter Line Number: ",48,57,9);
+	const std::string& inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_line+1),48,57,9);
 	if(inp_line_no.empty()){
 		move(cur_y, cur_x);
 		refresh();
 		return;
 	}
 	int line_no = stoi(inp_line_no) - 1;
-	if(line_no >= LINES_TEXT){
-		line_no = LINES_TEXT - 1;
+	if(line_no >= lines_text){
+		if(lines_text != 0){line_no = lines_text - 1;}
+		else{line_no = 0;}
 	}
 	//scroll text
 	move(line_no % INP_FLD,0);
@@ -86,6 +88,7 @@ void goto_line(){
 	return;
 }
 
+//change this to take list of strings and write to file
 bool writefile(const std::string &filepath,const std::string &contents) {
 	std::ofstream ofile(filepath,std::ios::trunc);
 	if(!ofile){return false;}
@@ -100,12 +103,12 @@ void clr_inp_fld(){
 	return;
 }
 
-std::string take_inp(const std::string& prompt,int l_ascii_lim,int u_ascii_lim,int max_len){
+std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,int u_ascii_lim,int max_len){
 	add_btn('C',"Cancel");
 	print_inp_fld(prompt);
+	print_inp_fld(inp,prompt.length());
 	attron(A_REVERSE);
 	int ch;
-	std::string inp = "";
 	while((ch = getch()) != '\n'){
 		if(ch == '\b'){
 			if(!inp.empty()){
@@ -133,10 +136,12 @@ std::string take_inp(const std::string& prompt,int l_ascii_lim,int u_ascii_lim,i
 	return inp;
 }
 
-void print_inp_fld(const std::string& msg){
+void print_inp_fld(const std::string& msg,int col){
 	attron(A_REVERSE);
-	mvaddstr(INP_FLD,0,msg.c_str());
+	mvaddstr(INP_FLD,col,msg.c_str());
 	attroff(A_REVERSE);
 	refresh();
 	return;
 }
+
+void readfile(const std::string& filepath, std::list<std::string>& text){}
