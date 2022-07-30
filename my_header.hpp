@@ -8,9 +8,11 @@
 #include <list>
 
 
-#define INP_FLD (LINES-2)
-#define MAX_Y_TEXT (INP_FLD-1)
-#define OPN_FLD_1 (INP_FLD+1)
+#define OPN_FLD_SIZE 1
+#define INP_FLD (LINES - OPN_FLD_SIZE - 1)
+#define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE)
+#define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
+#define OPN_FLD_1 (INP_FLD + 1)
 
 
 
@@ -22,23 +24,25 @@ void add_btn(char ch, const std::string& btn_name);
 
 void remove_btn();
 
-void write_out(const std::string& filepath,const std::string& text);
+void write_out(const std::string& filepath,const std::list<std::string>& text);
 
-void goto_line(int cur_line,int lines_text);
+void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text);
 
-bool writefile(const std::string &filepath,const std::string &contents);
+bool writefile(const std::string &filepath,const std::list<std::string>& text);
 
 void clr_inp_fld();
 
 std::string take_inp(const std::string& prompt, std::string inp,int l_ascii_lim, int u_ascii_lim, int max_len);
 
-void print_inp_fld(const std::string& msg,int col = 0);
+void print_inp_fld(const std::string& msg);
 
 void readfile(const std::string& filepath, std::list<std::string>& text);
 
 void ctn_btn(const std::string& prompt);
 
 void render_full(const std::list<std::string>& text,int y_text);
+
+void clr_txt_area();
 
 
 #endif

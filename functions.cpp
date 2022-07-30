@@ -44,8 +44,7 @@ void remove_btn(){
 	return;
 }
 
-//change this to take list of strings and write to file
-void write_out(const std::string& filepath,const std::string& text){
+void write_out(const std::string& filepath,const std::list<std::string>& text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
 	const std::string& new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
@@ -62,37 +61,41 @@ void write_out(const std::string& filepath,const std::string& text){
 	return;
 }
 
-void goto_line(int cur_line,int lines_text){
+void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	const std::string& inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_line+1),48,57,9);
+	const std::string& inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_y_text+1),48,57,9);
 	if(inp_line_no.empty()){
 		move(cur_y, cur_x);
 		refresh();
 		return;
 	}
-	int line_no = stoi(inp_line_no) - 1;
-	if(line_no >= lines_text){
-		if(lines_text != 0){line_no = lines_text - 1;}
-		else{line_no = 0;}
+	int y_text = stoi(inp_line_no) - 1;
+	if(y_text >= lines_text){
+		if(lines_text != 0){y_text = lines_text - 1;}
+		else{y_text = 0;}
 	}
-	//scroll text
-	move(line_no % INP_FLD,0);
+	render_full(text,y_text);
+	move(0,0);
 	refresh();
 	return;
 }
 
-//change this to take list of strings and write to file
-bool writefile(const std::string &filepath,const std::string &contents) {
+bool writefile(const std::string &filepath,const std::list<std::string>& text) {
 	std::ofstream ofile(filepath,std::ios::trunc);
 	if(!ofile){return false;}
-	ofile << contents;
+	for(const auto& line : text){
+		ofile << line << std::endl;
+	}
 	ofile.close();
 	return true;
 }
 
 void clr_inp_fld(){
-	mvaddstr(INP_FLD,0,"                                                                                                                        ");
+	move(INP_FLD,0);
+	for(int i=0;i<COLS;i++){
+		addch(' ');
+	}
 	refresh();
 	return;
 }
@@ -129,9 +132,9 @@ std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,i
 	return inp;
 }
 
-void print_inp_fld(const std::string& msg,int col){
+void print_inp_fld(const std::string& msg){
 	attron(A_REVERSE);
-	mvaddstr(INP_FLD,col,msg.c_str());
+	mvaddstr(INP_FLD,0,msg.c_str());
 	attroff(A_REVERSE);
 	refresh();
 	return;
@@ -141,7 +144,8 @@ void readfile(const std::string& filepath, std::list<std::string>& text){
 	std::ifstream ifile(filepath);
 	if(!ifile){ctn_btn("Failed to Open File: " + filepath);}
 	std::string line;
-	while(!std::getline(ifile,line).eof()){
+	while(!ifile.eof()){
+		std::getline(ifile,line);
 		text.push_back(line);
 	}
 	ifile.close();
@@ -160,19 +164,33 @@ void ctn_btn(const std::string& prompt){
 }
 
 void render_full(const std::list<std::string>& text,int y_text){
-	auto it = text.begin();
-	std::advance(it, y_text);
-	auto end = it;
-	std::advance(end, MAX_Y_TEXT);
-	int i=0;
-	for(;it != end;it++){
-		if((*it).length() > COLS){
-			mvaddstr(i,0,(*it).substr(0,COLS-1).c_str());
-			addch('>' | A_REVERSE);
+	clr_txt_area();
+	auto it = std::next(text.begin(),y_text);
+	int render_lines_no;
+	if(text.size()-y_text < LINES_TEXT_AREA){
+		render_lines_no = text.size()-y_text;
+	}
+	else{render_lines_no = LINES_TEXT_AREA;}
+	for(int i=0;i<render_lines_no;i++,it++){
+		if(it->length() <= COLS){
+			mvaddstr(i,0,it->c_str());
 		}
 		else{
-			mvaddstr(i,0,(*it).c_str());
+			mvaddstr(i,0,it->substr(0,COLS-1).c_str());
+			addch('>' | A_REVERSE);
 		}
 	}
+	refresh();
+	return;
+}
+
+void clr_txt_area(){
+	for(int i=0;i<=MAX_Y_TEXT_AREA;i++){
+		move(i,0);
+		for(int j=0;j<COLS;j++){
+			addch(' ');
+		}
+	}
+	refresh();
 	return;
 }
