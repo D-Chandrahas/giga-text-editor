@@ -9,7 +9,7 @@
 
 
 #define INP_FLD (LINES-2)
-#define TEXT_Y_MAX (INP_FLD-1)
+#define MAX_Y_TEXT (INP_FLD-1)
 #define OPN_FLD_1 (INP_FLD+1)
 
 
@@ -37,6 +37,8 @@ void print_inp_fld(const std::string& msg,int col = 0);
 void readfile(const std::string& filepath, std::list<std::string>& text);
 
 void ctn_btn(const std::string& prompt);
+
+void render_full(const std::list<std::string>& text,int y_text);
 
 
 #endif

@@ -139,12 +139,9 @@ void print_inp_fld(const std::string& msg,int col){
 
 void readfile(const std::string& filepath, std::list<std::string>& text){
 	std::ifstream ifile(filepath);
-	if(!ifile){
-		ctn_btn("Failed to Open File: " + filepath);
-	}
+	if(!ifile){ctn_btn("Failed to Open File: " + filepath);}
 	std::string line;
 	while(!std::getline(ifile,line).eof()){
-		line += '\n';
 		text.push_back(line);
 	}
 	ifile.close();
@@ -159,5 +156,23 @@ void ctn_btn(const std::string& prompt){
 	while((ch = getch()) != 3){}
 	remove_btn();
 	clr_inp_fld();
+	return;
+}
+
+void render_full(const std::list<std::string>& text,int y_text){
+	auto it = text.begin();
+	std::advance(it, y_text);
+	auto end = it;
+	std::advance(end, MAX_Y_TEXT);
+	int i=0;
+	for(;it != end;it++){
+		if((*it).length() > COLS){
+			mvaddstr(i,0,(*it).substr(0,COLS-1).c_str());
+			addch('>' | A_REVERSE);
+		}
+		else{
+			mvaddstr(i,0,(*it).c_str());
+		}
+	}
 	return;
 }

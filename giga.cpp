@@ -16,6 +16,8 @@ int main(int argc, char** argv){
 	int cur_y_text = 0;
 	int cur_x_text = 0;
 	init();
+	render_full(text,0);
+	move(0,0);
 
 	while(TRUE){
 		ch = getch();

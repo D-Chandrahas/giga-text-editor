@@ -33,3 +33,6 @@
 
 #pdfs
 *.pdf
+
+#test files
+test.cpp
