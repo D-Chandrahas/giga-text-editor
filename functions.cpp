@@ -2,7 +2,7 @@
 
 
 
-void init(){
+void initialize_program(){
 	initscr();
 	noecho();
 	raw();
@@ -15,13 +15,15 @@ void init(){
 
 void print_menu(){
     attron(A_REVERSE);
-    mvaddstr(OPN_FLD_1,0,"CTRL + O");
+    mvaddstr(OPN_FLD_1,0,"CTRL + W");
     mvaddstr(OPN_FLD_1,25,"CTRL + X");
-	mvaddstr(OPN_FLD_1,50,"CTRL + L");
+	mvaddstr(OPN_FLD_1,50,"CTRL + G");
+	mvaddstr(OPN_FLD_1,75,"CTRL + O");
     attroff(A_REVERSE);
     mvaddstr(OPN_FLD_1,8," Write Out");
     mvaddstr(OPN_FLD_1,33," Exit");
 	mvaddstr(OPN_FLD_1,58," Go to Line");
+	mvaddstr(OPN_FLD_1,83," Open File");
 	move(0,0);
     refresh();
     return;
@@ -47,8 +49,8 @@ void remove_btn(){
 void write_out(const std::string& filepath,const std::list<std::string>& text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	const std::string& new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
-	if(!new_filepath.empty()){
+	std::string new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
+	if((new_filepath != CANCEL_CODE) and (new_filepath != "")){
 		if(!writefile(new_filepath, text)){
 			ctn_btn("Failed to Write File...");
 		}
@@ -64,8 +66,8 @@ void write_out(const std::string& filepath,const std::list<std::string>& text){
 void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	const std::string& inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_y_text+1),48,57,9);
-	if(inp_line_no.empty()){
+	std::string inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_y_text+1),48,57,9);
+	if((inp_line_no == CANCEL_CODE) or (inp_line_no == "")){
 		move(cur_y, cur_x);
 		refresh();
 		return;
@@ -119,6 +121,7 @@ std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,i
 		}
 		if(ch == 3){
 			inp.clear();
+			inp += char(3);
 			break;
 		}
 		if(ch > u_ascii_lim or ch < l_ascii_lim or inp.length() >= max_len){continue;}
@@ -142,7 +145,11 @@ void print_inp_fld(const std::string& msg){
 
 void readfile(const std::string& filepath, std::list<std::string>& text){
 	std::ifstream ifile(filepath);
-	if(!ifile){ctn_btn("Failed to Open File: " + filepath);}
+	if(!ifile){
+		ctn_btn("Failed to Open File: " + filepath);
+		ifile.close();
+		return;
+	}
 	std::string line;
 	while(!ifile.eof()){
 		std::getline(ifile,line);
@@ -193,4 +200,44 @@ void clr_txt_area(){
 	}
 	refresh();
 	return;
+}
+
+
+//https://docs.microsoft.com/en-us/cpp/cpp/extern-cpp?view=msvc-170
+//make them extern variables and replace wherever they can be replaced
+bool restart_program(std::string& filepath){
+	std::list<std::string> text;
+	if(filepath != ""){
+		readfile(filepath,text);
+	}
+	int ch;
+	int cur_x = 0;
+	int cur_y = 0;
+	int lines_text = text.size();
+	int cur_y_text = 0;
+	int cur_x_text = 0;
+	initialize_program();
+	render_full(text,0);
+	move(0,0);
+
+	while(TRUE){
+		ch = getch();
+		if(ch == 24){endwin();return false;}
+		if(ch == 23){write_out(filepath,text);continue;}
+		if(ch == 7){goto_line(text,cur_y_text,lines_text);continue;}
+		if(ch == 15){
+			if(open_file(filepath)){endwin();return true;}
+			else{continue;}
+		}
+		else{
+			addch(ch);
+		}
+		refresh();
+	}
+}
+
+bool open_file(std::string& filepath){
+	std::string new_filepath = take_inp("Enter Filepath: ","",32,126,100);
+	if(new_filepath == CANCEL_CODE){return false;}
+	else{filepath = new_filepath;return true;}
 }

@@ -10,13 +10,15 @@
 
 #define OPN_FLD_SIZE 1
 #define INP_FLD (LINES - OPN_FLD_SIZE - 1)
-#define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE)
+#define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE-1)
 #define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
 #define OPN_FLD_1 (INP_FLD + 1)
 
+extern const char CANCEL_CODE[2];
 
 
-void init();
+
+void initialize_program();
 
 void print_menu();
 
@@ -43,6 +45,11 @@ void ctn_btn(const std::string& prompt);
 void render_full(const std::list<std::string>& text,int y_text);
 
 void clr_txt_area();
+
+bool restart_program(std::string& filepath);
+
+bool open_file(std::string& filepath);
+
 
 
 #endif
