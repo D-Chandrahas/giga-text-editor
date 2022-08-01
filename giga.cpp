@@ -1,5 +1,9 @@
 #include "my_header.hpp"
 
+//add open new file button by transfering code in main() into a new function called start_interface(string& filename)
+// and putting start_interface() in a infinite loop in main and when new file btn is pressed change filename and return;
+//filename variable is outside loop
+//implement exit by having a bool exit=start_interface(filename) (or) start_interface(filename,bool& exit) and if exit break;
 
 //make them global variables and replace wherever they can be replaced
 int main(int argc, char** argv){
