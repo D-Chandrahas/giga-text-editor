@@ -35,4 +35,5 @@
 *.pdf
 
 #test files
-test.cpp
+test*.cpp
+test*.txt

@@ -14,8 +14,6 @@
 #define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
 #define OPN_FLD_1 (INP_FLD + 1)
 
-extern const char CANCEL_CODE[2];
-
 
 
 void initialize_program();
@@ -24,11 +22,13 @@ void print_menu();
 
 void add_btn(char ch, const std::string& btn_name);
 
+void add_enter_btn(const std::string& btn_name);
+
 void remove_btn();
 
 void write_out(const std::string& filepath,const std::list<std::string>& text);
 
-void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text);
+void goto_line(const std::list<std::string>& text);
 
 bool writefile(const std::string &filepath,const std::list<std::string>& text);
 

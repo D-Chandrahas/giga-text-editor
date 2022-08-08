@@ -1,6 +1,11 @@
 #include "my_header.hpp"
 
 
+static const char CANCEL_CODE[2] = {char(3),'\0'};
+static int CUR_Y_TEXT = 0;
+static int CUR_X_TEXT = 0;
+
+
 
 void initialize_program(){
 	initscr();
@@ -40,6 +45,16 @@ void add_btn(char ch,const std::string& btn_name){
 	return;
 }
 
+void add_enter_btn(const std::string& btn_name){
+	attron(A_REVERSE);
+	mvaddstr(OPN_FLD_1,100,"ENTER");
+	attroff(A_REVERSE);
+	addch(' ');
+	addstr(btn_name.c_str());
+	refresh();
+	return;
+}
+
 void remove_btn(){
 	mvaddstr(OPN_FLD_1,100,"                    ");
 	refresh();
@@ -63,10 +78,10 @@ void write_out(const std::string& filepath,const std::list<std::string>& text){
 	return;
 }
 
-void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text){
-	int cur_x, cur_y;
+void goto_line(const std::list<std::string>& text){
+	int cur_x, cur_y, lines_text = text.size();
 	getyx(stdscr, cur_y, cur_x);
-	std::string inp_line_no = take_inp("Enter Line Number: ",std::to_string(cur_y_text+1),48,57,9);
+	std::string inp_line_no = take_inp("Enter Line Number: ",std::to_string(CUR_Y_TEXT+1),48,57,9);
 	if((inp_line_no == CANCEL_CODE) or (inp_line_no == "")){
 		move(cur_y, cur_x);
 		refresh();
@@ -77,6 +92,7 @@ void goto_line(const std::list<std::string>& text,int cur_y_text,int lines_text)
 		if(lines_text != 0){y_text = lines_text - 1;}
 		else{y_text = 0;}
 	}
+	CUR_Y_TEXT = y_text;
 	render_full(text,y_text);
 	move(0,0);
 	refresh();
@@ -159,12 +175,13 @@ void readfile(const std::string& filepath, std::list<std::string>& text){
 	return;
 }
 
+//if button is ctrl + c ,does not work in readfile(), but works in writefile()
 void ctn_btn(const std::string& prompt){
-	add_btn('C',"Continue");
+	add_enter_btn("Continue");
 	print_inp_fld(prompt);
 	refresh();
 	int ch;
-	while((ch = getch()) != 3){}
+	while((ch = getch()) != '\n'){}
 	remove_btn();
 	clr_inp_fld();
 	return;
@@ -202,9 +219,6 @@ void clr_txt_area(){
 	return;
 }
 
-
-//https://docs.microsoft.com/en-us/cpp/cpp/extern-cpp?view=msvc-170
-//make them extern variables and replace wherever they can be replaced
 bool restart_program(std::string& filepath){
 	std::list<std::string> text;
 	if(filepath != ""){
@@ -213,9 +227,6 @@ bool restart_program(std::string& filepath){
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;
-	int lines_text = text.size();
-	int cur_y_text = 0;
-	int cur_x_text = 0;
 	initialize_program();
 	render_full(text,0);
 	move(0,0);
@@ -224,7 +235,7 @@ bool restart_program(std::string& filepath){
 		ch = getch();
 		if(ch == 24){endwin();return false;}
 		if(ch == 23){write_out(filepath,text);continue;}
-		if(ch == 7){goto_line(text,cur_y_text,lines_text);continue;}
+		if(ch == 7){goto_line(text);continue;}
 		if(ch == 15){
 			if(open_file(filepath)){endwin();return true;}
 			else{continue;}
