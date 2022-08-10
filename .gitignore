@@ -26,14 +26,14 @@
 *.a
 *.lib
 
-# Executables
-*.exe
-*.out
-*.app
+# # Executables
+# *.exe
+# *.out
+# *.app
 
 #pdfs
 *.pdf
 
-#test files
-test*.cpp
-test*.txt
+#test folder and files
+test/
+test*.*
