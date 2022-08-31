@@ -19,19 +19,19 @@ void initialize_program(){
 }
 
 void print_menu(){
-    attron(A_REVERSE);
-    mvaddstr(OPN_FLD_1,0,"CTRL + W");
-    mvaddstr(OPN_FLD_1,25,"CTRL + X");
+	attron(A_REVERSE);
+	mvaddstr(OPN_FLD_1,0,"CTRL + W");
+	mvaddstr(OPN_FLD_1,25,"CTRL + X");
 	mvaddstr(OPN_FLD_1,50,"CTRL + G");
 	mvaddstr(OPN_FLD_1,75,"CTRL + O");
-    attroff(A_REVERSE);
-    mvaddstr(OPN_FLD_1,8," Write Out");
-    mvaddstr(OPN_FLD_1,33," Exit");
+	attroff(A_REVERSE);
+	mvaddstr(OPN_FLD_1,8," Write Out");
+	mvaddstr(OPN_FLD_1,33," Exit");
 	mvaddstr(OPN_FLD_1,58," Go to Line");
 	mvaddstr(OPN_FLD_1,83," Open File");
 	move(0,0);
-    refresh();
-    return;
+	refresh();
+	return;
 }
 
 void add_btn(char ch,const std::string& btn_name){
@@ -88,13 +88,17 @@ void goto_line(const std::list<std::string>& text){
 		return;
 	}
 	int y_text = stoi(inp_line_no) - 1;
-	if(y_text >= lines_text){
-		if(lines_text != 0){y_text = lines_text - 1;}
-		else{y_text = 0;}
-	}
+	if(y_text >= lines_text){y_text = lines_text - 1;}
 	CUR_Y_TEXT = y_text;
-	render_full(text,y_text);
-	move(0,0);
+	CUR_X_TEXT = 0;
+	if(lines_text - y_text >= LINES_TEXT_AREA){
+		render_full(text,y_text);
+		move(0,0);
+	}
+	else{
+		render_full(text,lines_text-LINES_TEXT_AREA);
+		move(LINES_TEXT_AREA-(lines_text-y_text),0);
+	}
 	refresh();
 	return;
 }
@@ -126,7 +130,7 @@ std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,i
 	while((ch = getch()) != '\n'){
 		if(ch == '\b'){
 			if(!inp.empty()){
-    			inp.pop_back();
+				inp.pop_back();
 				attroff(A_REVERSE);
 				addstr("\b \b");
 				attron(A_REVERSE);
@@ -224,9 +228,12 @@ bool restart_program(std::string& filepath){
 	if(filepath != ""){
 		readfile(filepath,text);
 	}
+	else{text.push_back("");}
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;
+	CUR_X_TEXT = 0;
+	CUR_Y_TEXT = 0;
 	initialize_program();
 	render_full(text,0);
 	move(0,0);
