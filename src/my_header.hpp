@@ -56,9 +56,9 @@ void key_up(const std::list<std::string>& text);
 
 void key_down(const std::list<std::string>& text);
 
-void key_left(const std::list<std::string>& text);
+//void key_left(const std::list<std::string>& text);
 
-void key_right(const std::list<std::string>& text);
+//void key_right(const std::list<std::string>& text);
 
 
 

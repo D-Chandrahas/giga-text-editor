@@ -4,7 +4,7 @@
             "name": "C/C++: g++.exe build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}\\..\\bin\\${fileBasenameNoExtension}.exe",
+            "program": "${fileDirname}\\..\\bin\\giga.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}\\..\\bin",

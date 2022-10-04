@@ -259,8 +259,8 @@ bool restart_program(std::string& filepath){
 		}
 		if(ch == KEY_UP){key_up(text);continue;}
 		if(ch == KEY_DOWN){key_down(text);continue;}
-		if(ch == KEY_LEFT){key_left(text);continue;}
-		if(ch == KEY_RIGHT){key_right(text);continue;}
+		//if(ch == KEY_LEFT){key_left(text);continue;}
+		//if(ch == KEY_RIGHT){key_right(text);continue;}
 		else{
 			
 		}
