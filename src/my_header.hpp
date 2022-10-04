@@ -50,6 +50,8 @@ bool restart_program(std::string& filepath);
 
 bool open_file(std::string& filepath);
 
+int scr_x_state(int x_text);
+
 void key_up(const std::list<std::string>& text);
 
 void key_down(const std::list<std::string>& text);
