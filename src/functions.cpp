@@ -92,11 +92,11 @@ void goto_line(const std::list<std::string>& text){
 	CUR_Y_TEXT = y_text;
 	CUR_X_TEXT = 0;
 	if(lines_text - y_text >= LINES_TEXT_AREA){
-		render_full(text,y_text);
+		render_full(text,y_text,0);
 		move(0,0);
 	}
 	else{
-		render_full(text,lines_text-LINES_TEXT_AREA);
+		render_full(text,lines_text-LINES_TEXT_AREA,0);
 		move(LINES_TEXT_AREA-(lines_text-y_text),0);
 	}
 	refresh();
@@ -191,7 +191,7 @@ void ctn_btn(const std::string& prompt){
 	return;
 }
 
-void render_full(const std::list<std::string>& text,int y_text){
+void render_full(const std::list<std::string>& text,int y_text,int x_text){
 	clr_txt_area();
 	auto it = std::next(text.begin(),y_text);
 	int render_lines_no;
@@ -199,13 +199,23 @@ void render_full(const std::list<std::string>& text,int y_text){
 		render_lines_no = text.size()-y_text;
 	}
 	else{render_lines_no = LINES_TEXT_AREA;}
-	for(int i=0;i<render_lines_no;i++,it++){
-		if(it->length() <= COLS){
-			mvaddstr(i,0,it->c_str());
+	if(x_text < COLS-1){
+		for(int i=0;i<render_lines_no;i++,it++){
+			mvaddstr(i,0,(it->substr(x_text,COLS-1)).c_str());
+			if((it->length()) - x_text > COLS-1){
+				addch('>' | A_REVERSE);
+			}
 		}
-		else{
-			mvaddstr(i,0,it->substr(0,COLS-1).c_str());
-			addch('>' | A_REVERSE);
+	}
+	else{
+		for(int i=0;i<render_lines_no;i++,it++){
+			if(it->length() > x_text){
+				addch('<' | A_REVERSE);
+			}
+			mvaddstr(i,1,(it->substr(x_text,COLS-2)).c_str());
+			if((it->length()) - x_text > COLS-1){
+				addch('>' | A_REVERSE);
+			}
 		}
 	}
 	refresh();
@@ -235,7 +245,7 @@ bool restart_program(std::string& filepath){
 	CUR_X_TEXT = 0;
 	CUR_Y_TEXT = 0;
 	initialize_program();
-	render_full(text,0);
+	render_full(text,0,0);
 	move(0,0);
 
 	while(TRUE){
@@ -247,8 +257,12 @@ bool restart_program(std::string& filepath){
 			if(open_file(filepath)){endwin();return true;}
 			else{continue;}
 		}
+		if(ch == KEY_UP){key_up(text);continue;}
+		if(ch == KEY_DOWN){key_down(text);continue;}
+		if(ch == KEY_LEFT){key_left(text);continue;}
+		if(ch == KEY_RIGHT){key_right(text);continue;}
 		else{
-			addch(ch);
+			
 		}
 		refresh();
 	}
@@ -259,3 +273,40 @@ bool open_file(std::string& filepath){
 	if(new_filepath == CANCEL_CODE){return false;}
 	else{filepath = new_filepath;return true;}
 }
+
+void key_up(const std::list<std::string>& text){
+	if(CUR_Y_TEXT == 0){return;}
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	CUR_Y_TEXT--;
+	auto new_it = std::next(text.begin(),CUR_Y_TEXT);
+	if(CUR_X_TEXT > new_it->length()){
+		CUR_X_TEXT = new_it->length();
+	}
+	if(cur_y == 0){
+		render_full(text,CUR_Y_TEXT,CUR_X_TEXT-(CUR_X_TEXT%COLS));
+		move(0,CUR_X_TEXT%COLS);
+	}
+	else{
+		move(cur_y-1,CUR_X_TEXT%COLS);
+	}
+}
+
+void key_down(const std::list<std::string>& text){
+	if(CUR_Y_TEXT == text.size()-1){return;}
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	CUR_Y_TEXT++;
+	auto new_it = std::next(text.begin(),CUR_Y_TEXT);
+	if(CUR_X_TEXT > new_it->length()){
+		CUR_X_TEXT = new_it->length();
+	}
+	if(cur_y == MAX_Y_TEXT_AREA){
+		render_full(text,CUR_Y_TEXT-(LINES_TEXT_AREA-1),CUR_X_TEXT-(CUR_X_TEXT%COLS));
+		move(MAX_Y_TEXT_AREA,CUR_X_TEXT%COLS);
+	}
+	else{
+		move(cur_y+1,CUR_X_TEXT%COLS);
+	}
+}
+
