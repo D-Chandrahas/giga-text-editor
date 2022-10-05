@@ -5,7 +5,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}\\..\\bin\\giga.exe",
-            "args": [],
+            "args": ["test.txt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}\\..\\bin",
             "environment": [],

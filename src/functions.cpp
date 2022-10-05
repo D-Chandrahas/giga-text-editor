@@ -282,10 +282,12 @@ int scr_x_state(int x_text){
 	else{return (x_text)-(x_text-(COLS-1))%(COLS-2);}
 }
 
-int scr_y_state(int y_text){
-	return y_text - (y_text%(LINES_TEXT_AREA));
-}
+inline int scr_y_state(int y_text,int y){return ((y_text) - (y));}
 
+int get_cur_x(int x_text){
+	if(x_text <= COLS - 2){return x_text;}
+	else{return x_text - scr_x_state(x_text) + 1;}
+}
 
 void key_up(const std::list<std::string>& text){
 	if(CUR_Y_TEXT == 0){return;}
@@ -298,11 +300,11 @@ void key_up(const std::list<std::string>& text){
 	}
 	if(cur_y == 0){
 		render_full(text,CUR_Y_TEXT,scr_x_state(CUR_X_TEXT));
-		move(0,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+		move(0,get_cur_x(CUR_X_TEXT));
 	}
 	else{
-		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
-		move(cur_y-1,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y-1),scr_x_state(CUR_X_TEXT));
+		move(cur_y-1,get_cur_x(CUR_X_TEXT));
 	}
 	refresh();
 	return;
@@ -319,11 +321,11 @@ void key_down(const std::list<std::string>& text){
 	}
 	if(cur_y == MAX_Y_TEXT_AREA){
 		render_full(text,CUR_Y_TEXT-(LINES_TEXT_AREA-1),scr_x_state(CUR_X_TEXT));
-		move(MAX_Y_TEXT_AREA,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+		move(MAX_Y_TEXT_AREA,get_cur_x(CUR_X_TEXT));
 	}
 	else{
-		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
-		move(cur_y+1,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y+1),scr_x_state(CUR_X_TEXT));
+		move(cur_y+1,get_cur_x(CUR_X_TEXT));
 	}
 	refresh();
 	return;
@@ -340,9 +342,9 @@ void key_left(const std::list<std::string>& text){
 	int cur_x,cur_y;
 	getyx(stdscr,cur_y,cur_x);
 	CUR_X_TEXT--;
-	if(cur_x == 0){
-		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
-		move(cur_y,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+	if(CUR_X_TEXT+1 > COLS-2  and cur_x == 1){
+		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+		move(cur_y,get_cur_x(CUR_X_TEXT));
 	}
 	else{
 		move(cur_y,cur_x-1);
@@ -363,8 +365,8 @@ void key_right(const std::list<std::string>& text){
 	getyx(stdscr,cur_y,cur_x);
 	CUR_X_TEXT++;
 	if(cur_x == COLS-2){
-		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
-		move(cur_y,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+		move(cur_y,get_cur_x(CUR_X_TEXT));
 	}
 	else{
 		move(cur_y,cur_x+1);
