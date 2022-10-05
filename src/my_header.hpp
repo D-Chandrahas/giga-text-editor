@@ -52,13 +52,15 @@ bool open_file(std::string& filepath);
 
 int scr_x_state(int x_text);
 
+int scr_y_state(int y_text);
+
 void key_up(const std::list<std::string>& text);
 
 void key_down(const std::list<std::string>& text);
 
-//void key_left(const std::list<std::string>& text);
+void key_left(const std::list<std::string>& text);
 
-//void key_right(const std::list<std::string>& text);
+void key_right(const std::list<std::string>& text);
 
 
 

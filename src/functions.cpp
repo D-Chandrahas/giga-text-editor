@@ -96,8 +96,10 @@ void goto_line(const std::list<std::string>& text){
 		move(0,0);
 	}
 	else{
-		render_full(text,lines_text-LINES_TEXT_AREA,0);
-		move(LINES_TEXT_AREA-(lines_text-y_text),0);
+		int y_text_render = lines_text - LINES_TEXT_AREA;
+		if(y_text_render < 0){y_text_render = 0;}
+		render_full(text,y_text_render,0);
+		move(y_text-y_text_render,0);
 	}
 	refresh();
 	return;
@@ -107,7 +109,7 @@ bool writefile(const std::string &filepath,const std::list<std::string>& text) {
 	std::ofstream ofile(filepath,std::ios::trunc);
 	if(!ofile){return false;}
 	for(const auto& line : text){
-		ofile << line << std::endl;
+		ofile << line;
 	}
 	ofile.close();
 	return true;
@@ -173,6 +175,7 @@ void readfile(const std::string& filepath, std::list<std::string>& text){
 	std::string line;
 	while(!ifile.eof()){
 		std::getline(ifile,line);
+		line += "\n";
 		text.push_back(line);
 	}
 	ifile.close();
@@ -202,19 +205,19 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text){
 	if(x_text == 0){
 		for(int i=0;i<render_lines_no;i++,it++){
 			mvaddstr(i,0,(it->substr(x_text,COLS-1)).c_str());
-			if((it->length()) - x_text > COLS-1){
-				addch('>' | A_REVERSE);
+			if((it->length()) > COLS-1 + x_text){
+				mvaddch(i,COLS-1,'>' | A_REVERSE);
 			}
 		}
 	}
 	else{
 		for(int i=0;i<render_lines_no;i++,it++){
 			if(it->length() > x_text){
-				addch('<' | A_REVERSE);
+				mvaddch(i,0,'<' | A_REVERSE);
+				mvaddstr(i,1,(it->substr(x_text,COLS-2)).c_str());
 			}
-			mvaddstr(i,1,(it->substr(x_text,COLS-2)).c_str());
-			if((it->length()) - x_text > COLS-2){
-				addch('>' | A_REVERSE);
+			if((it->length()) > COLS-2 + x_text){
+				mvaddch(i,COLS-1,'>' | A_REVERSE);
 			}
 		}
 	}
@@ -259,8 +262,8 @@ bool restart_program(std::string& filepath){
 		}
 		if(ch == KEY_UP){key_up(text);continue;}
 		if(ch == KEY_DOWN){key_down(text);continue;}
-		//if(ch == KEY_LEFT){key_left(text);continue;}
-		//if(ch == KEY_RIGHT){key_right(text);continue;}
+		if(ch == KEY_LEFT){key_left(text);continue;}
+		if(ch == KEY_RIGHT){key_right(text);continue;}
 		else{
 			
 		}
@@ -275,26 +278,34 @@ bool open_file(std::string& filepath){
 }
 
 int scr_x_state(int x_text){
-	if(x_text <= COLS - 2){return x_text%(COLS-1);}
-	else{return (x_text-(COLS-1))%(COLS-2);}
+	if(x_text <= COLS - 2){return 0;}
+	else{return (x_text)-(x_text-(COLS-1))%(COLS-2);}
 }
+
+int scr_y_state(int y_text){
+	return y_text - (y_text%(LINES_TEXT_AREA));
+}
+
 
 void key_up(const std::list<std::string>& text){
 	if(CUR_Y_TEXT == 0){return;}
 	int cur_x,cur_y;
 	getyx(stdscr,cur_y,cur_x);
 	CUR_Y_TEXT--;
-	auto new_it = std::next(text.begin(),CUR_Y_TEXT);
-	if(CUR_X_TEXT > new_it->length()){
-		CUR_X_TEXT = new_it->length();
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	if(CUR_X_TEXT > it->length()-1){
+		CUR_X_TEXT = it->length()-1;
 	}
 	if(cur_y == 0){
 		render_full(text,CUR_Y_TEXT,scr_x_state(CUR_X_TEXT));
-		move(0,CUR_X_TEXT%COLS);
+		move(0,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
 	}
 	else{
-		move(cur_y-1,CUR_X_TEXT%COLS);
+		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
+		move(cur_y-1,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
 	}
+	refresh();
+	return;
 }
 
 void key_down(const std::list<std::string>& text){
@@ -302,16 +313,63 @@ void key_down(const std::list<std::string>& text){
 	int cur_x,cur_y;
 	getyx(stdscr,cur_y,cur_x);
 	CUR_Y_TEXT++;
-	auto new_it = std::next(text.begin(),CUR_Y_TEXT);
-	if(CUR_X_TEXT > new_it->length()){
-		CUR_X_TEXT = new_it->length();
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	if(CUR_X_TEXT > it->length()-1){
+		CUR_X_TEXT = it->length()-1;
 	}
 	if(cur_y == MAX_Y_TEXT_AREA){
 		render_full(text,CUR_Y_TEXT-(LINES_TEXT_AREA-1),scr_x_state(CUR_X_TEXT));
 		move(MAX_Y_TEXT_AREA,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
 	}
 	else{
+		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
 		move(cur_y+1,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
 	}
+	refresh();
+	return;
+}
+
+void key_left(const std::list<std::string>& text){
+	if(CUR_X_TEXT <= 0 and CUR_Y_TEXT <= 0){return;}
+	if(CUR_X_TEXT <= 0 and CUR_Y_TEXT > 0){
+		auto it = std::next(text.begin(),CUR_Y_TEXT-1);
+		CUR_X_TEXT = it->length()-1;
+		key_up(text);
+		return;
+	}
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	CUR_X_TEXT--;
+	if(cur_x == 0){
+		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
+		move(cur_y,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+	}
+	else{
+		move(cur_y,cur_x-1);
+	}
+	refresh();
+	return;
+}
+
+void key_right(const std::list<std::string>& text){
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	if((CUR_X_TEXT + 1 >= (it->length())) and (CUR_Y_TEXT + 1 >= (text.size()))){return;}
+	if((CUR_X_TEXT + 1 >= (it->length())) and (CUR_Y_TEXT + 1 < (text.size()))){
+		CUR_X_TEXT = 0;
+		key_down(text);
+		return;
+	}
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	CUR_X_TEXT++;
+	if(cur_x == COLS-2){
+		render_full(text,scr_y_state(CUR_Y_TEXT),scr_x_state(CUR_X_TEXT));
+		move(cur_y,CUR_X_TEXT - scr_x_state(CUR_X_TEXT));
+	}
+	else{
+		move(cur_y,cur_x+1);
+	}
+	refresh();
+	return;
 }
 
