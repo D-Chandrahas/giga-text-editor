@@ -267,7 +267,7 @@ bool restart_program(std::string& filepath){
 		if(ch == KEY_ENTER or ch == '\n'){key_enter(text);continue;}
 		if(ch >= 32 and ch <= 126){key_char(text,ch);continue;}
 		if(ch == KEY_BACKSPACE or ch == '\b'){key_backspace(text);continue;}
-		//if(ch == KEY_DC or ch == 127){key_delchar(text);continue;}
+		if(ch == KEY_DC or ch == 127){key_delchar(text);continue;}
 		refresh();
 	}
 }
@@ -425,21 +425,26 @@ void key_backspace(std::list<std::string>& text){
 	return;
 }
 
-// void key_delete(std::list<std::string>& text){
-// 	auto it = std::next(text.begin(),CUR_Y_TEXT);
-// 	if(CUR_X_TEXT >= it->length() and CUR_Y_TEXT + 1 >= text.size()){return;}
-// 	if(CUR_X_TEXT >= it->length() and CUR_Y_TEXT + 1 < text.size()){
-// 		it->append(*(std::next(text.begin(),CUR_Y_TEXT+1)));
-// 		text.erase(std::next(text.begin(),CUR_Y_TEXT+1));
-// 		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-// 		move(cur_y,get_cur_x(CUR_X_TEXT));
-// 		refresh();
-// 		return;
-// 	}
-// 	it->erase(CUR_X_TEXT,1);
-// 	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-// 	move(cur_y,get_cur_x(CUR_X_TEXT));
-// 	refresh();
-// 	return;
-// }
+void key_delchar(std::list<std::string>& text){
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	if(CUR_X_TEXT >= it->length()-1 and CUR_Y_TEXT >= text.size()-1){return;}
+	if(CUR_X_TEXT >= it->length()-1 and CUR_Y_TEXT < text.size()-1){
+		auto curr = std::next(text.begin(),CUR_Y_TEXT);
+		auto next = std::next(curr);
+		curr->pop_back();
+		curr->append(*next);
+		text.erase(next);
+		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+		move(cur_y,get_cur_x(CUR_X_TEXT));
+		refresh();
+		return;
+	}
+	it->erase(CUR_X_TEXT,1);
+	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+	move(cur_y,get_cur_x(CUR_X_TEXT));
+	refresh();
+	return;
+}
 
