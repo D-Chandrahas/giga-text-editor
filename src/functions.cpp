@@ -175,7 +175,7 @@ void readfile(const std::string& filepath, std::list<std::string>& text){
 	std::string line;
 	while(!ifile.eof()){
 		std::getline(ifile,line);
-		line += "\n";
+		line.push_back('\n');
 		text.push_back(line);
 	}
 	ifile.close();
@@ -241,7 +241,7 @@ bool restart_program(std::string& filepath){
 	if(filepath != ""){
 		readfile(filepath,text);
 	}
-	else{text.push_back("");}
+	else{text.push_back("\n");}
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;
@@ -253,10 +253,10 @@ bool restart_program(std::string& filepath){
 
 	while(TRUE){
 		ch = getch();
-		if(ch == 24){endwin();return false;}
-		if(ch == 23){write_out(filepath,text);continue;}
-		if(ch == 7){goto_line(text);continue;}
-		if(ch == 15){
+		if(ch == CTRL('X')){endwin();return false;}
+		if(ch == CTRL('W')){write_out(filepath,text);continue;}
+		if(ch == CTRL('G')){goto_line(text);continue;}
+		if(ch == CTRL('O')){
 			if(open_file(filepath)){endwin();return true;}
 			else{continue;}
 		}
@@ -264,9 +264,10 @@ bool restart_program(std::string& filepath){
 		if(ch == KEY_DOWN){key_down(text);continue;}
 		if(ch == KEY_LEFT){key_left(text);continue;}
 		if(ch == KEY_RIGHT){key_right(text);continue;}
-		else{
-			
-		}
+		if(ch == KEY_ENTER or ch == '\n'){key_enter(text);continue;}
+		if(ch >= 32 and ch <= 126){key_char(text,ch);continue;}
+		if(ch == KEY_BACKSPACE or ch == '\b'){key_backspace(text);continue;}
+		//if(ch == KEY_DC or ch == 127){key_delchar(text);continue;}
 		refresh();
 	}
 }
@@ -374,4 +375,71 @@ void key_right(const std::list<std::string>& text){
 	refresh();
 	return;
 }
+
+void key_enter(std::list<std::string>& text){
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	std::string new_line = it->substr(CUR_X_TEXT);
+	it->erase(CUR_X_TEXT);
+	it->push_back('\n');
+	text.insert(++it,new_line);
+	CUR_X_TEXT = 0;
+	key_down(text);
+	refresh();
+	return;
+}
+
+void key_char(std::list<std::string>& text,int ch){
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	it->insert(CUR_X_TEXT,1,ch);
+	CUR_X_TEXT++;
+	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+	move(cur_y,get_cur_x(CUR_X_TEXT));
+	refresh();
+	return;
+}
+
+void key_backspace(std::list<std::string>& text){
+	if(CUR_X_TEXT <= 0 and CUR_Y_TEXT <= 0){return;}
+	if(CUR_X_TEXT <= 0 and CUR_Y_TEXT > 0){
+		auto curr = std::next(text.begin(),CUR_Y_TEXT);
+		auto prev = std::prev(curr);
+		CUR_X_TEXT = prev->length() - 1;
+		prev->pop_back();
+		prev->append(*curr);
+		text.erase(curr);
+		key_up(text);
+		return;
+	}
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	auto it = std::next(text.begin(),CUR_Y_TEXT);
+	it->erase(CUR_X_TEXT-1,1);
+	CUR_X_TEXT--;
+	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+	move(cur_y,get_cur_x(CUR_X_TEXT));
+	refresh();
+	return;
+}
+
+// void key_delete(std::list<std::string>& text){
+// 	auto it = std::next(text.begin(),CUR_Y_TEXT);
+// 	if(CUR_X_TEXT >= it->length() and CUR_Y_TEXT + 1 >= text.size()){return;}
+// 	if(CUR_X_TEXT >= it->length() and CUR_Y_TEXT + 1 < text.size()){
+// 		it->append(*(std::next(text.begin(),CUR_Y_TEXT+1)));
+// 		text.erase(std::next(text.begin(),CUR_Y_TEXT+1));
+// 		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+// 		move(cur_y,get_cur_x(CUR_X_TEXT));
+// 		refresh();
+// 		return;
+// 	}
+// 	it->erase(CUR_X_TEXT,1);
+// 	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+// 	move(cur_y,get_cur_x(CUR_X_TEXT));
+// 	refresh();
+// 	return;
+// }
 

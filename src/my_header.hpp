@@ -15,6 +15,8 @@
 #define OPN_FLD_1 (INP_FLD + 1)
 
 
+#define CTRL(x) ((x) & 0x1f)
+
 
 void initialize_program();
 
@@ -62,6 +64,13 @@ void key_left(const std::list<std::string>& text);
 
 void key_right(const std::list<std::string>& text);
 
+void key_enter(std::list<std::string>& text);
+
+void key_char(std::list<std::string>& text,int ch);
+
+void key_backspace(std::list<std::string>& text);
+
+void key_delchar(std::list<std::string>& text);
 
 
 #endif

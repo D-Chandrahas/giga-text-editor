@@ -14,7 +14,7 @@
                 //"${file}",
                 "${fileDirname}\\*.cpp",
                 "-o",
-                "${fileDirname}\\..\\bin\\giga.exe",
+                "${fileDirname}\\..\\bin\\${fileBasenameNoExtension}.exe",
                 "-lncursesw",
                 "-lsystre",
                 "-ltre",
