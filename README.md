@@ -1,2 +1,1 @@
-# Work in progress..
-## Testing for bugs..
+# Check here later for build instructions
