@@ -1,5 +1,5 @@
-#ifndef MY_HEADER_HPP
-#define MY_HEADER_HPP
+#ifndef MAIN_HEADER_HPP
+#define MAIN_HEADER_HPP
 
 
 #include <ncurses.h>
