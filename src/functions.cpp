@@ -36,15 +36,15 @@ void initialize_program(){
 
 void print_menu(){
 	attron(A_REVERSE);
-	mvaddstr(OPN_FLD_1,0,"CTRL + W");
-	mvaddstr(OPN_FLD_1,20,"CTRL + X");
-	mvaddstr(OPN_FLD_1,40,"CTRL + G");
-	mvaddstr(OPN_FLD_1,60,"CTRL + O");
+	mvaddstr(OPN_FLD_1,0,"^W");
+	mvaddstr(OPN_FLD_1,15,"^X");
+	mvaddstr(OPN_FLD_1,30,"^G");
+	mvaddstr(OPN_FLD_1,45,"^O");
 	attroff(A_REVERSE);
-	mvaddstr(OPN_FLD_1,8," Write Out");
-	mvaddstr(OPN_FLD_1,28," Exit");
-	mvaddstr(OPN_FLD_1,48," Go to Line");
-	mvaddstr(OPN_FLD_1,68," Open File");
+	mvaddstr(OPN_FLD_1,3," Write Out");
+	mvaddstr(OPN_FLD_1,18," Exit");
+	mvaddstr(OPN_FLD_1,33," Go to Line");
+	mvaddstr(OPN_FLD_1,48," Open File");
 	move(0,0);
 	refresh();
 	return;
@@ -52,7 +52,7 @@ void print_menu(){
 
 void add_btn(char ch,const std::string& btn_name){
 	attron(A_REVERSE);
-	mvaddstr(OPN_FLD_1,100,"CTRL + ");
+	mvaddch(OPN_FLD_1,60,'^');
 	addch(ch);
 	attroff(A_REVERSE);
 	addch(' ');
@@ -63,7 +63,7 @@ void add_btn(char ch,const std::string& btn_name){
 
 void add_enter_btn(const std::string& btn_name){
 	attron(A_REVERSE);
-	mvaddstr(OPN_FLD_1,100,"ENTER");
+	mvaddstr(OPN_FLD_1,60,"ENTER");
 	attroff(A_REVERSE);
 	addch(' ');
 	addstr(btn_name.c_str());
@@ -72,7 +72,10 @@ void add_enter_btn(const std::string& btn_name){
 }
 
 void remove_btn(){
-	mvaddstr(OPN_FLD_1,100,"                    ");
+	mvaddch(OPN_FLD_1,60,' ');
+	for(int i = 61; i < COLS; i++){
+		addch(' ');
+	}
 	refresh();
 	return;
 }
@@ -211,9 +214,9 @@ void ctn_btn(const std::string& prompt){
 }
 
 void render_full(const std::list<std::string>& text,int y_text,int x_text){
-	// clr_txt_area();
-	clear();
-	print_menu();
+	// clr_full();
+	// print_menu();
+	clr_txt_area();
 	auto it = std::next(text.begin(),y_text);
 	int render_lines_no;
 	if(text.size()-y_text < LINES_TEXT_AREA){
@@ -254,6 +257,19 @@ void clr_txt_area(){
 	return;
 }
 
+// void clr_full(){
+// 	int max_y,max_x;
+// 	getmaxyx(stdscr,max_y,max_x);
+// 	for(int i=0;i<=max_y;i++){
+// 		move(i,0);
+// 		for(int j=0;j<=max_x;j++){
+// 			addch(' ');
+// 		}
+// 	}
+// 	refresh();
+// 	return;
+// }
+
 bool restart_program(std::string& filepath){
 	std::list<std::string> text;
 	if(filepath != ""){
@@ -268,10 +284,21 @@ bool restart_program(std::string& filepath){
 	initialize_program();
 	render_full(text,0,0);
 	move(0,0);
+	int max_x,max_y;
+	getmaxyx(stdscr,max_y,max_x);
 
 	while(TRUE){
-		if(resize_flag == 1){resize(text);resize_flag = 0;continue;}
-		
+		// {
+		// 	int cur_max_x,cur_max_y;
+		// 	getmaxyx(stdscr,cur_max_y,cur_max_x);
+		// 	if(max_y != cur_max_y or max_x != cur_max_x){
+		// 		resize(text);
+		// 		max_y = cur_max_y;
+		// 		max_x = cur_max_x;
+		// 		continue;
+		// 	}
+		// }
+
 		ch = getch();
 		
 		if(ch == CTRL('X')){endwin();return false;}
@@ -469,11 +496,11 @@ void key_delchar(std::list<std::string>& text){
 	return;
 }
 
-void resize(std::list<std::string>& text){
-	int cur_x,cur_y;
-	getyx(stdscr,cur_y,cur_x);
-	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-	move(cur_y,get_cur_x(CUR_X_TEXT));
-	refresh();
-	return;
-}
+// void resize(std::list<std::string>& text){
+// 	int cur_x,cur_y;
+// 	getyx(stdscr,cur_y,cur_x);
+// 	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+// 	move(cur_y,get_cur_x(CUR_X_TEXT));
+// 	refresh();
+// 	return;
+// }

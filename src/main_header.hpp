@@ -19,8 +19,6 @@
 #define CTRL(x) ((x) & 0x1f)
 
 
-extern int resize_flag;
-
 
 void initialize_program();
 
@@ -52,6 +50,8 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text);
 
 void clr_txt_area();
 
+// void clr_full();
+
 bool restart_program(std::string& filepath);
 
 bool open_file(std::string& filepath);
@@ -76,7 +76,7 @@ void key_backspace(std::list<std::string>& text);
 
 void key_delchar(std::list<std::string>& text);
 
-void resize(std::list<std::string>& text);
+// void resize(std::list<std::string>& text);
 
 
 #endif
