@@ -1,4 +1,4 @@
-# Build instructions for ubuntu
+## Build instructions for ubuntu
 - `sudo apt update`
 - `sudo apt install pkg-config`
 - `git clone https://github.com/D-Chandrahas/giga-text-editor`
