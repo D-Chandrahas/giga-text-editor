@@ -211,7 +211,9 @@ void ctn_btn(const std::string& prompt){
 }
 
 void render_full(const std::list<std::string>& text,int y_text,int x_text){
-	clr_txt_area();
+	// clr_txt_area();
+	clear();
+	print_menu();
 	auto it = std::next(text.begin(),y_text);
 	int render_lines_no;
 	if(text.size()-y_text < LINES_TEXT_AREA){
@@ -268,7 +270,10 @@ bool restart_program(std::string& filepath){
 	move(0,0);
 
 	while(TRUE){
+		if(resize_flag == 1){resize(text);resize_flag = 0;continue;}
+		
 		ch = getch();
+		
 		if(ch == CTRL('X')){endwin();return false;}
 		if(ch == CTRL('W')){write_out(filepath,text);continue;}
 		if(ch == CTRL('G')){goto_line(text);continue;}
@@ -464,3 +469,11 @@ void key_delchar(std::list<std::string>& text){
 	return;
 }
 
+void resize(std::list<std::string>& text){
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
+	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+	move(cur_y,get_cur_x(CUR_X_TEXT));
+	refresh();
+	return;
+}

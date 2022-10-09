@@ -2,6 +2,7 @@
 #define MAIN_HEADER_HPP
 
 
+#include <csignal>
 #include <ncurses.h>
 #include <string>
 #include <fstream>
@@ -16,6 +17,9 @@
 
 
 #define CTRL(x) ((x) & 0x1f)
+
+
+extern int resize_flag;
 
 
 void initialize_program();
@@ -71,6 +75,8 @@ void key_char(std::list<std::string>& text,int ch);
 void key_backspace(std::list<std::string>& text);
 
 void key_delchar(std::list<std::string>& text);
+
+void resize(std::list<std::string>& text);
 
 
 #endif
