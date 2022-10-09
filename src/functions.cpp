@@ -18,17 +18,33 @@ void initialize_program(){
 	return;
 }
 
+// void print_menu(){
+// 	attron(A_REVERSE);
+// 	mvaddstr(OPN_FLD_1,0,"CTRL + W");
+// 	mvaddstr(OPN_FLD_1,25,"CTRL + X");
+// 	mvaddstr(OPN_FLD_1,50,"CTRL + G");
+// 	mvaddstr(OPN_FLD_1,75,"CTRL + O");
+// 	attroff(A_REVERSE);
+// 	mvaddstr(OPN_FLD_1,8," Write Out");
+// 	mvaddstr(OPN_FLD_1,33," Exit");
+// 	mvaddstr(OPN_FLD_1,58," Go to Line");
+// 	mvaddstr(OPN_FLD_1,83," Open File");
+// 	move(0,0);
+// 	refresh();
+// 	return;
+// }
+
 void print_menu(){
 	attron(A_REVERSE);
 	mvaddstr(OPN_FLD_1,0,"CTRL + W");
-	mvaddstr(OPN_FLD_1,25,"CTRL + X");
-	mvaddstr(OPN_FLD_1,50,"CTRL + G");
-	mvaddstr(OPN_FLD_1,75,"CTRL + O");
+	mvaddstr(OPN_FLD_1,20,"CTRL + X");
+	mvaddstr(OPN_FLD_1,40,"CTRL + G");
+	mvaddstr(OPN_FLD_1,60,"CTRL + O");
 	attroff(A_REVERSE);
 	mvaddstr(OPN_FLD_1,8," Write Out");
-	mvaddstr(OPN_FLD_1,33," Exit");
-	mvaddstr(OPN_FLD_1,58," Go to Line");
-	mvaddstr(OPN_FLD_1,83," Open File");
+	mvaddstr(OPN_FLD_1,28," Exit");
+	mvaddstr(OPN_FLD_1,48," Go to Line");
+	mvaddstr(OPN_FLD_1,68," Open File");
 	move(0,0);
 	refresh();
 	return;
