@@ -284,8 +284,8 @@ bool restart_program(std::string& filepath){
 	initialize_program();
 	render_full(text,0,0);
 	move(0,0);
-	int max_x,max_y;
-	getmaxyx(stdscr,max_y,max_x);
+	// int max_x,max_y;
+	// getmaxyx(stdscr,max_y,max_x);
 
 	while(TRUE){
 		// {
@@ -321,8 +321,10 @@ bool restart_program(std::string& filepath){
 }
 
 bool open_file(std::string& filepath){
+	int cur_x,cur_y;
+	getyx(stdscr,cur_y,cur_x);
 	std::string new_filepath = take_inp("Enter Filepath: ","",32,126,100);
-	if(new_filepath == CANCEL_CODE){return false;}
+	if(new_filepath == CANCEL_CODE){move(cur_y,cur_x);return false;}
 	else{filepath = new_filepath;return true;}
 }
 
