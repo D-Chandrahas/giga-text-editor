@@ -41,10 +41,10 @@ void print_menu(){
 	mvaddstr(OPN_FLD_1,30,"^G");
 	mvaddstr(OPN_FLD_1,45,"^O");
 	attroff(A_REVERSE);
-	mvaddstr(OPN_FLD_1,3," Write Out");
-	mvaddstr(OPN_FLD_1,18," Exit");
-	mvaddstr(OPN_FLD_1,33," Go to Line");
-	mvaddstr(OPN_FLD_1,48," Open File");
+	mvaddstr(OPN_FLD_1,2," Write Out");
+	mvaddstr(OPN_FLD_1,17," Exit");
+	mvaddstr(OPN_FLD_1,32," Go to Line");
+	mvaddstr(OPN_FLD_1,47," Open File");
 	move(0,0);
 	refresh();
 	return;
@@ -72,8 +72,8 @@ void add_enter_btn(const std::string& btn_name){
 }
 
 void remove_btn(){
-	mvaddch(OPN_FLD_1,60,' ');
-	for(int i = 61; i < COLS; i++){
+	move(OPN_FLD_1,60);
+	for(int i = 60; i <= getmaxx(stdscr); i++){
 		addch(' ');
 	}
 	refresh();
