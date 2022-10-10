@@ -6,6 +6,17 @@ static int CUR_Y_TEXT = 0;
 static int CUR_X_TEXT = 0;
 
 
+inline int max_lines(){ return getmaxy(stdscr); }
+
+inline int max_cols(){ return getmaxx(stdscr); }
+
+inline int y_inp_fld(){ return max_lines() - OPN_FLD_SIZE - INP_FLD_SIZE; }
+
+inline int max_lines_text_area(){ return max_lines() - OPN_FLD_SIZE - INP_FLD_SIZE; }
+
+inline int max_y_text_area(){ return max_lines_text_area() - 1; }
+
+inline int y_opn_fld(int i){ return y_inp_fld() + i; }
 
 void initialize_program(){
 	initscr();
@@ -19,32 +30,34 @@ void initialize_program(){
 }
 
 // void print_menu(){
-// 	attron(A_REVERSE);
-// 	mvaddstr(OPN_FLD_1,0,"CTRL + W");
-// 	mvaddstr(OPN_FLD_1,25,"CTRL + X");
-// 	mvaddstr(OPN_FLD_1,50,"CTRL + G");
-// 	mvaddstr(OPN_FLD_1,75,"CTRL + O");
+//  int y_opn_fld_1 = y_inp_fld(1);
+//  attron(A_REVERSE);
+// 	mvaddstr(y_opn_fld_1,0,"CTRL + W");
+// 	mvaddstr(y_opn_fld_1,25,"CTRL + X");
+// 	mvaddstr(y_opn_fld_1,50,"CTRL + G");
+// 	mvaddstr(y_opn_fld_1,75,"CTRL + O");
 // 	attroff(A_REVERSE);
-// 	mvaddstr(OPN_FLD_1,8," Write Out");
-// 	mvaddstr(OPN_FLD_1,33," Exit");
-// 	mvaddstr(OPN_FLD_1,58," Go to Line");
-// 	mvaddstr(OPN_FLD_1,83," Open File");
+// 	mvaddstr(y_opn_fld_1,8," Write Out");
+// 	mvaddstr(y_opn_fld_1,33," Exit");
+// 	mvaddstr(y_opn_fld_1,58," Go to Line");
+// 	mvaddstr(y_opn_fld_1,83," Open File");
 // 	move(0,0);
 // 	refresh();
 // 	return;
 // }
 
 void print_menu(){
+	int y_opn_fld_1 = y_opn_fld(1);
 	attron(A_REVERSE);
-	mvaddstr(OPN_FLD_1,0,"^W");
-	mvaddstr(OPN_FLD_1,15,"^X");
-	mvaddstr(OPN_FLD_1,30,"^G");
-	mvaddstr(OPN_FLD_1,45,"^O");
+	mvaddstr(y_opn_fld_1,0,"^W");
+	mvaddstr(y_opn_fld_1,15,"^X");
+	mvaddstr(y_opn_fld_1,30,"^G");
+	mvaddstr(y_opn_fld_1,45,"^O");
 	attroff(A_REVERSE);
-	mvaddstr(OPN_FLD_1,2," Write Out");
-	mvaddstr(OPN_FLD_1,17," Exit");
-	mvaddstr(OPN_FLD_1,32," Go to Line");
-	mvaddstr(OPN_FLD_1,47," Open File");
+	mvaddstr(y_opn_fld_1,2," Write Out");
+	mvaddstr(y_opn_fld_1,17," Exit");
+	mvaddstr(y_opn_fld_1,32," Go to Line");
+	mvaddstr(y_opn_fld_1,47," Open File");
 	move(0,0);
 	refresh();
 	return;
@@ -52,7 +65,7 @@ void print_menu(){
 
 void add_btn(char ch,const std::string& btn_name){
 	attron(A_REVERSE);
-	mvaddch(OPN_FLD_1,60,'^');
+	mvaddch(y_opn_fld(1),60,'^');
 	addch(ch);
 	attroff(A_REVERSE);
 	addch(' ');
@@ -63,7 +76,7 @@ void add_btn(char ch,const std::string& btn_name){
 
 void add_enter_btn(const std::string& btn_name){
 	attron(A_REVERSE);
-	mvaddstr(OPN_FLD_1,60,"ENTER");
+	mvaddstr(y_opn_fld(1),60,"ENTER");
 	attroff(A_REVERSE);
 	addch(' ');
 	addstr(btn_name.c_str());
@@ -72,8 +85,8 @@ void add_enter_btn(const std::string& btn_name){
 }
 
 void remove_btn(){
-	move(OPN_FLD_1,60);
-	for(int i = 60; i < COLS; i++){
+	move(y_opn_fld(1),60);
+	for(int i = 60; i < max_cols(); i++){
 		addch(' ');
 	}
 	refresh();
@@ -110,12 +123,13 @@ void goto_line(const std::list<std::string>& text){
 	if(y_text >= lines_text){y_text = lines_text - 1;}
 	CUR_Y_TEXT = y_text;
 	CUR_X_TEXT = 0;
-	if(lines_text - y_text >= LINES_TEXT_AREA){
+	int maxlinestextarea = max_lines_text_area();
+	if(lines_text - y_text >= maxlinestextarea){
 		render_full(text,y_text,0);
 		move(0,0);
 	}
 	else{
-		int y_text_render = lines_text - LINES_TEXT_AREA;
+		int y_text_render = lines_text - maxlinestextarea;
 		if(y_text_render < 0){y_text_render = 0;}
 		render_full(text,y_text_render,0);
 		move(y_text-y_text_render,0);
@@ -135,8 +149,8 @@ bool writefile(const std::string &filepath,const std::list<std::string>& text) {
 }
 
 void clr_inp_fld(){
-	move(INP_FLD,0);
-	for(int i=0;i<COLS;i++){
+	move(y_inp_fld(),0);
+	for(int i=0;i<max_cols();i++){
 		addch(' ');
 	}
 	refresh();
@@ -178,7 +192,7 @@ std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,i
 
 void print_inp_fld(const std::string& msg){
 	attron(A_REVERSE);
-	mvaddstr(INP_FLD,0,msg.c_str());
+	mvaddstr(y_inp_fld(),0,msg.c_str());
 	attroff(A_REVERSE);
 	refresh();
 	return;
@@ -217,17 +231,19 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text){
 	// clr_full();
 	// print_menu();
 	clr_txt_area();
+	int maxcols = max_cols();
+	int maxlinestextarea = max_lines_text_area();
 	auto it = std::next(text.begin(),y_text);
 	int render_lines_no;
-	if(text.size()-y_text < LINES_TEXT_AREA){
+	if(text.size()-y_text < maxlinestextarea){
 		render_lines_no = text.size()-y_text;
 	}
-	else{render_lines_no = LINES_TEXT_AREA;}
+	else{render_lines_no = maxlinestextarea;}
 	if(x_text == 0){
 		for(int i=0;i<render_lines_no;i++,it++){
-			mvaddstr(i,0,(it->substr(x_text,COLS-1)).c_str());
-			if((it->length()) > COLS-1 + x_text){
-				mvaddch(i,COLS-1,'>' | A_REVERSE);
+			mvaddstr(i,0,(it->substr(x_text,maxcols-1)).c_str());
+			if((it->length()) > maxcols-1 + x_text){
+				mvaddch(i,maxcols-1,'>' | A_REVERSE);
 			}
 		}
 	}
@@ -235,10 +251,10 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text){
 		for(int i=0;i<render_lines_no;i++,it++){
 			if(it->length() > x_text){
 				mvaddch(i,0,'<' | A_REVERSE);
-				mvaddstr(i,1,(it->substr(x_text,COLS-2)).c_str());
+				mvaddstr(i,1,(it->substr(x_text,maxcols-2)).c_str());
 			}
-			if((it->length()) > COLS-2 + x_text){
-				mvaddch(i,COLS-1,'>' | A_REVERSE);
+			if((it->length()) > maxcols-2 + x_text){
+				mvaddch(i,maxcols-1,'>' | A_REVERSE);
 			}
 		}
 	}
@@ -247,9 +263,9 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text){
 }
 
 void clr_txt_area(){
-	for(int i=0;i<=MAX_Y_TEXT_AREA;i++){
+	for(int i=0;i<=max_y_text_area();i++){
 		move(i,0);
-		for(int j=0;j<COLS;j++){
+		for(int j=0;j<max_cols();j++){
 			addch(' ');
 		}
 	}
@@ -258,9 +274,9 @@ void clr_txt_area(){
 }
 
 // void clr_full(){
-// 	for(int i=0;i<LINES;i++){
+// 	for(int i=0;i<max_lines();i++){
 // 		move(i,0);
-// 		for(int j=0;j<COLS;j++){
+// 		for(int j=0;j<max_cols();j++){
 // 			addch(' ');
 // 		}
 // 	}
@@ -314,14 +330,15 @@ bool open_file(std::string& filepath){
 }
 
 int scr_x_state(int x_text){
-	if(x_text <= COLS - 2){return 0;}
-	else{return (x_text)-(x_text-(COLS-1))%(COLS-2);}
+	int maxcols = max_cols();
+	if(x_text <= maxcols - 2){return 0;}
+	else{return (x_text)-(x_text-(maxcols-1))%(maxcols-2);}
 }
 
 inline int scr_y_state(int y_text,int y){return ((y_text) - (y));}
 
 int get_cur_x(int x_text){
-	if(x_text <= COLS - 2){return x_text;}
+	if(x_text <= max_cols() - 2){return x_text;}
 	else{return x_text - scr_x_state(x_text) + 1;}
 }
 
@@ -355,9 +372,10 @@ void key_down(const std::list<std::string>& text){
 	if(CUR_X_TEXT > it->length()-1){
 		CUR_X_TEXT = it->length()-1;
 	}
-	if(cur_y == MAX_Y_TEXT_AREA){
-		render_full(text,CUR_Y_TEXT-(LINES_TEXT_AREA-1),scr_x_state(CUR_X_TEXT));
-		move(MAX_Y_TEXT_AREA,get_cur_x(CUR_X_TEXT));
+	int maxytextarea = max_y_text_area();
+	if(cur_y == maxytextarea){
+		render_full(text,CUR_Y_TEXT-(max_lines_text_area()-1),scr_x_state(CUR_X_TEXT));
+		move(maxytextarea,get_cur_x(CUR_X_TEXT));
 	}
 	else{
 		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y+1),scr_x_state(CUR_X_TEXT));
@@ -378,7 +396,7 @@ void key_left(const std::list<std::string>& text){
 	int cur_x,cur_y;
 	getyx(stdscr,cur_y,cur_x);
 	CUR_X_TEXT--;
-	if(CUR_X_TEXT+1 > COLS-2  and cur_x == 1){
+	if(CUR_X_TEXT+1 > max_cols()-2  and cur_x == 1){
 		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
 		move(cur_y,get_cur_x(CUR_X_TEXT));
 	}
@@ -400,7 +418,7 @@ void key_right(const std::list<std::string>& text){
 	int cur_x,cur_y;
 	getyx(stdscr,cur_y,cur_x);
 	CUR_X_TEXT++;
-	if(cur_x == COLS-2){
+	if(cur_x == max_cols()-2){
 		render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
 		move(cur_y,get_cur_x(CUR_X_TEXT));
 	}

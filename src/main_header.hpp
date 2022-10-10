@@ -9,27 +9,30 @@
 #include <list>
 
 
-#ifdef LINES
-#undef LINES
-#define LINES (getmaxy(stdscr))
-#else
-#define LINES (getmaxy(stdscr))
-#endif
 
-#ifdef COLS
-#undef COLS
-#define COLS (getmaxx(stdscr))
-#else
-#define COLS (getmaxx(stdscr))
-#endif
+inline int max_lines();
 
+inline int max_cols();
+
+
+// #define OPN_FLD_SIZE 1
+// #define INP_FLD (LINES - OPN_FLD_SIZE - 1)
+// #define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE - 1)
+// #define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
+// #define OPN_FLD_1 (INP_FLD + 1)
+
+#define INP_FLD_SIZE 1
 
 #define OPN_FLD_SIZE 1
-#define INP_FLD (LINES - OPN_FLD_SIZE - 1)
-#define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE - 1)
-#define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
-#define OPN_FLD_1 (INP_FLD + 1)
 
+
+inline int y_inp_fld();
+
+inline int max_lines_text_area();
+
+inline int max_y_text_area();
+
+inline int y_opn_fld(int i);
 
 
 #define CTRL(x) ((x) & 0x1f)
@@ -74,7 +77,9 @@ bool open_file(std::string& filepath);
 
 int scr_x_state(int x_text);
 
-int scr_y_state(int y_text);
+inline int scr_y_state(int y_text);
+
+int get_cur_x(int x_text);
 
 void key_up(const std::list<std::string>& text);
 
