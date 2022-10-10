@@ -73,7 +73,7 @@ void add_enter_btn(const std::string& btn_name){
 
 void remove_btn(){
 	move(OPN_FLD_1,60);
-	for(int i = 60; i <= getmaxx(stdscr); i++){
+	for(int i = 60; i < COLS; i++){
 		addch(' ');
 	}
 	refresh();
@@ -258,11 +258,9 @@ void clr_txt_area(){
 }
 
 // void clr_full(){
-// 	int max_y,max_x;
-// 	getmaxyx(stdscr,max_y,max_x);
-// 	for(int i=0;i<=max_y;i++){
+// 	for(int i=0;i<LINES;i++){
 // 		move(i,0);
-// 		for(int j=0;j<=max_x;j++){
+// 		for(int j=0;j<COLS;j++){
 // 			addch(' ');
 // 		}
 // 	}
@@ -284,21 +282,8 @@ bool restart_program(std::string& filepath){
 	initialize_program();
 	render_full(text,0,0);
 	move(0,0);
-	// int max_x,max_y;
-	// getmaxyx(stdscr,max_y,max_x);
 
 	while(TRUE){
-		// {
-		// 	int cur_max_x,cur_max_y;
-		// 	getmaxyx(stdscr,cur_max_y,cur_max_x);
-		// 	if(max_y != cur_max_y or max_x != cur_max_x){
-		// 		resize(text);
-		// 		max_y = cur_max_y;
-		// 		max_x = cur_max_x;
-		// 		continue;
-		// 	}
-		// }
-
 		ch = getch();
 		
 		if(ch == CTRL('X')){endwin();return false;}

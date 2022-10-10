@@ -9,11 +9,27 @@
 #include <list>
 
 
+#ifdef LINES
+#undef LINES
+#define LINES (getmaxy(stdscr))
+#else
+#define LINES (getmaxy(stdscr))
+#endif
+
+#ifdef COLS
+#undef COLS
+#define COLS (getmaxx(stdscr))
+#else
+#define COLS (getmaxx(stdscr))
+#endif
+
+
 #define OPN_FLD_SIZE 1
 #define INP_FLD (LINES - OPN_FLD_SIZE - 1)
 #define LINES_TEXT_AREA (LINES - OPN_FLD_SIZE - 1)
 #define MAX_Y_TEXT_AREA (LINES_TEXT_AREA - 1)
 #define OPN_FLD_1 (INP_FLD + 1)
+
 
 
 #define CTRL(x) ((x) & 0x1f)
