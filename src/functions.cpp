@@ -36,23 +36,6 @@ void initialize_window(){
 	return;
 }
 
-// void print_menu(){
-//  int y_opn_fld_1 = y_inp_fld(1);
-//  attron(A_REVERSE);
-// 	mvaddstr(y_opn_fld_1,0,"CTRL + W");
-// 	mvaddstr(y_opn_fld_1,25,"CTRL + X");
-// 	mvaddstr(y_opn_fld_1,50,"CTRL + G");
-// 	mvaddstr(y_opn_fld_1,75,"CTRL + O");
-// 	attroff(A_REVERSE);
-// 	mvaddstr(y_opn_fld_1,8," Write Out");
-// 	mvaddstr(y_opn_fld_1,33," Exit");
-// 	mvaddstr(y_opn_fld_1,58," Go to Line");
-// 	mvaddstr(y_opn_fld_1,83," Open File");
-// 	move(0,0);
-// 	refresh();
-// 	return;
-// }
-
 void print_menu(){
 	int y_opn_fld_1 = y_opn_fld(1);
 	attron(A_REVERSE);
@@ -235,8 +218,6 @@ void ctn_btn(const std::string& prompt){
 }
 
 void render_full(const std::list<std::string>& text,int y_text,int x_text){
-	// clr_full();
-	// print_menu();
 	clr_txt_area();
 	int maxcols = max_cols();
 	int maxlinestextarea = max_lines_text_area();
@@ -280,16 +261,16 @@ void clr_txt_area(){
 	return;
 }
 
-void clr_full(){
-	for(int i=0;i<max_lines();i++){
-		move(i,0);
-		for(int j=0;j<max_cols();j++){
-			addch(' ');
-		}
-	}
-	refresh();
-	return;
-}
+// void clr_full(){
+// 	for(int i=0;i<max_lines();i++){
+// 		move(i,0);
+// 		for(int j=0;j<max_cols();j++){
+// 			addch(' ');
+// 		}
+// 	}
+// 	refresh();
+// 	return;
+// }
 
 bool restart_program(std::string& filepath){
 	std::list<std::string> text;
@@ -516,38 +497,6 @@ void key_delchar(std::list<std::string>& text){
 	refresh();
 	return;
 }
-
-// void resize(std::list<std::string>& text){
-// 	int cur_x,cur_y;
-// 	getyx(stdscr,cur_y,cur_x);
-// 	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-// 	move(cur_y,get_cur_x(CUR_X_TEXT));
-// 	refresh();
-// 	return;
-// }
-
-// void check_and_resize(const std::list<std::string>& text){
-// 	int prev_lines = max_lines(),prev_cols = max_cols();
-// 	int curr_lines = max_lines(),curr_cols = max_cols();
-// 	while(!exit_flag){
-// 		if(resizable_flag){
-// 			continue_flag = false;
-// 			curr_lines=max_lines();curr_cols=max_cols();
-// 			if(curr_lines != prev_lines or curr_cols != prev_cols){
-// 				int cur_y = getcury(stdscr);
-// 				endwin();
-// 				initialize_window();
-// 				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-// 				move(cur_y,get_cur_x(CUR_X_TEXT));
-// 				refresh();
-// 				prev_lines = curr_lines; prev_cols = curr_cols;
-// 			}
-// 			continue_flag = true;
-// 		}
-// 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-// 	}
-// 	return;
-// }
 
 // void check_and_resize(const std::list<std::string>& text){
 // 	while(!exit_flag){
