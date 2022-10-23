@@ -553,8 +553,10 @@ void check_and_resize(const std::list<std::string>& text){
 			continue_flag = false;
 			if(SIGWINCH_flag){
 				int cur_y = getcury(stdscr);
-				endwin();
-				initialize_window();
+				// endwin();
+				// initialize_window();
+				clr_full();
+				print_menu();
 				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
 				move(cur_y,get_cur_x(CUR_X_TEXT));
 				refresh();
