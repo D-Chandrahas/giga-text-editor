@@ -7,7 +7,10 @@
 #include <string>
 #include <fstream>
 #include <list>
-
+#include <thread>
+#include <atomic>
+#include <chrono>
+#include <signal.h>
 
 
 inline int max_lines();
@@ -39,7 +42,7 @@ inline int y_opn_fld(int i);
 
 
 
-void initialize_program();
+void initialize_window();
 
 void print_menu();
 
@@ -69,7 +72,7 @@ void render_full(const std::list<std::string>& text,int y_text,int x_text);
 
 void clr_txt_area();
 
-// void clr_full();
+ void clr_full();
 
 bool restart_program(std::string& filepath);
 
@@ -98,6 +101,10 @@ void key_backspace(std::list<std::string>& text);
 void key_delchar(std::list<std::string>& text);
 
 // void resize(std::list<std::string>& text);
+
+void check_and_resize(const std::list<std::string>& text);
+
+void SIGWINCH_handler(int sig);
 
 
 #endif

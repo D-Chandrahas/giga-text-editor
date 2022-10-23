@@ -1,6 +1,12 @@
 #include "main_header.hpp"
 
 
+static std::atomic<bool> exit_flag = false;
+static std::atomic<bool> resizable_flag = false;
+static std::atomic<bool> continue_flag = true;
+static std::atomic<bool> SIGWINCH_flag = false;
+
+
 static const char CANCEL_CODE[2] = {char(3),'\0'};
 static int CUR_Y_TEXT = 0;
 static int CUR_X_TEXT = 0;
@@ -18,7 +24,7 @@ inline int max_y_text_area(){ return max_lines_text_area() - 1; }
 
 inline int y_opn_fld(int i){ return y_inp_fld() + i; }
 
-void initialize_program(){
+void initialize_window(){
 	initscr();
 	noecho();
 	raw();
@@ -51,13 +57,13 @@ void print_menu(){
 	attron(A_REVERSE);
 	mvaddstr(y_opn_fld_1,0,"^W");
 	mvaddstr(y_opn_fld_1,15,"^X");
-	mvaddstr(y_opn_fld_1,30,"^G");
-	mvaddstr(y_opn_fld_1,45,"^O");
+	mvaddstr(y_opn_fld_1,30,"^O");
+	mvaddstr(y_opn_fld_1,45,"^G");
 	attroff(A_REVERSE);
 	mvaddstr(y_opn_fld_1,2," Write Out");
 	mvaddstr(y_opn_fld_1,17," Exit");
-	mvaddstr(y_opn_fld_1,32," Go to Line");
-	mvaddstr(y_opn_fld_1,47," Open File");
+	mvaddstr(y_opn_fld_1,32," Open File");
+	mvaddstr(y_opn_fld_1,47," Go to Line");
 	move(0,0);
 	refresh();
 	return;
@@ -273,16 +279,16 @@ void clr_txt_area(){
 	return;
 }
 
-// void clr_full(){
-// 	for(int i=0;i<max_lines();i++){
-// 		move(i,0);
-// 		for(int j=0;j<max_cols();j++){
-// 			addch(' ');
-// 		}
-// 	}
-// 	refresh();
-// 	return;
-// }
+void clr_full(){
+	for(int i=0;i<max_lines();i++){
+		move(i,0);
+		for(int j=0;j<max_cols();j++){
+			addch(' ');
+		}
+	}
+	refresh();
+	return;
+}
 
 bool restart_program(std::string& filepath){
 	std::list<std::string> text;
@@ -295,18 +301,26 @@ bool restart_program(std::string& filepath){
 	int cur_y = 0;
 	CUR_X_TEXT = 0;
 	CUR_Y_TEXT = 0;
-	initialize_program();
+	initialize_window();
 	render_full(text,0,0);
 	move(0,0);
+	exit_flag = false;
+	std::thread resize_event_listener(check_and_resize,std::ref(text));
 
 	while(TRUE){
+		resizable_flag = true;
 		ch = getch();
+		resizable_flag = false;
+
+		while(!continue_flag){
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
 		
-		if(ch == CTRL('X')){endwin();return false;}
+		if(ch == CTRL('X')){endwin();exit_flag = true;resize_event_listener.join();return false;}
 		if(ch == CTRL('W')){write_out(filepath,text);continue;}
 		if(ch == CTRL('G')){goto_line(text);continue;}
 		if(ch == CTRL('O')){
-			if(open_file(filepath)){endwin();return true;}
+			if(open_file(filepath)){endwin();exit_flag = true;resize_event_listener.join();return true;}
 			else{continue;}
 		}
 		if(ch == KEY_UP){key_up(text);continue;}
@@ -509,3 +523,53 @@ void key_delchar(std::list<std::string>& text){
 // 	refresh();
 // 	return;
 // }
+
+// void check_and_resize(const std::list<std::string>& text){
+// 	int prev_lines = max_lines(),prev_cols = max_cols();
+// 	int curr_lines = max_lines(),curr_cols = max_cols();
+// 	while(!exit_flag){
+// 		if(resizable_flag){
+// 			continue_flag = false;
+// 			curr_lines=max_lines();curr_cols=max_cols();
+// 			if(curr_lines != prev_lines or curr_cols != prev_cols){
+// 				int cur_y = getcury(stdscr);
+// 				endwin();
+// 				initialize_window();
+// 				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+// 				move(cur_y,get_cur_x(CUR_X_TEXT));
+// 				refresh();
+// 				prev_lines = curr_lines; prev_cols = curr_cols;
+// 			}
+// 			continue_flag = true;
+// 		}
+// 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+// 	}
+// 	return;
+// }
+
+void check_and_resize(const std::list<std::string>& text){
+	while(!exit_flag){
+		if(resizable_flag){
+			continue_flag = false;
+			if(SIGWINCH_flag){
+				int cur_y = getcury(stdscr);
+				endwin();
+				initialize_window();
+				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+				move(cur_y,get_cur_x(CUR_X_TEXT));
+				refresh();
+			}
+			continue_flag = true;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+	return;
+}
+
+void SIGWINCH_handler(int sig){
+	// if(sig==SIGWINCH){
+	// 	SIGWINCH_flag = true;
+	// }
+	SIGWINCH_flag = true;
+	return;
+}
