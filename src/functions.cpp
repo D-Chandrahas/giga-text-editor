@@ -1,10 +1,10 @@
 #include "main_header.hpp"
 
 
-static std::atomic<bool> exit_flag = false;
-static std::atomic<bool> resizable_flag = false;
-static std::atomic<bool> continue_flag = true;
-static std::atomic<bool> SIGWINCH_flag = false;
+// static std::atomic<bool> exit_flag = false;
+// static std::atomic<bool> resizable_flag = false;
+// static std::atomic<bool> continue_flag = true;
+// static std::atomic<bool> SIGWINCH_flag = false;
 
 
 static const char CANCEL_CODE[2] = {char(3),'\0'};
@@ -26,6 +26,7 @@ inline int y_opn_fld(int i){ return y_inp_fld() + i; }
 
 void initialize_window(){
 	initscr();
+	clear();
 	noecho();
 	raw();
 	keypad(stdscr, TRUE);
@@ -169,7 +170,7 @@ std::string take_inp(const std::string& prompt,std::string inp,int l_ascii_lim,i
 	attron(A_REVERSE);
 	int ch;
 	while((ch = getch()) != '\n'){
-		if(ch == '\b'){
+		if(ch == '\b' or ch == KEY_BACKSPACE){
 			if(!inp.empty()){
 				inp.pop_back();
 				attroff(A_REVERSE);
@@ -304,23 +305,23 @@ bool restart_program(std::string& filepath){
 	initialize_window();
 	render_full(text,0,0);
 	move(0,0);
-	exit_flag = false;
-	std::thread resize_event_listener(check_and_resize,std::ref(text));
+	// exit_flag = false;
+	// std::thread resize_event_listener(check_and_resize,std::ref(text));
 
 	while(TRUE){
-		resizable_flag = true;
+		// resizable_flag = true;
 		ch = getch();
-		resizable_flag = false;
+		// resizable_flag = false;
 
-		while(!continue_flag){
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
+		// while(!continue_flag){
+		// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		// }
 		
-		if(ch == CTRL('X')){endwin();exit_flag = true;resize_event_listener.join();return false;}
+		if(ch == CTRL('X')){endwin();/*exit_flag = true;resize_event_listener.join();*/return false;}
 		if(ch == CTRL('W')){write_out(filepath,text);continue;}
 		if(ch == CTRL('G')){goto_line(text);continue;}
 		if(ch == CTRL('O')){
-			if(open_file(filepath)){endwin();exit_flag = true;resize_event_listener.join();return true;}
+			if(open_file(filepath)){endwin();/*exit_flag = true;resize_event_listener.join();*/return true;}
 			else{continue;}
 		}
 		if(ch == KEY_UP){key_up(text);continue;}
@@ -331,6 +332,7 @@ bool restart_program(std::string& filepath){
 		if(ch >= 32 and ch <= 126){key_char(text,ch);continue;}
 		if(ch == KEY_BACKSPACE or ch == '\b'){key_backspace(text);continue;}
 		if(ch == KEY_DC or ch == 127){key_delchar(text);continue;}
+		if(ch == KEY_RESIZE){resize(text);continue;}
 		refresh();
 	}
 }
@@ -547,31 +549,43 @@ void key_delchar(std::list<std::string>& text){
 // 	return;
 // }
 
-void check_and_resize(const std::list<std::string>& text){
-	while(!exit_flag){
-		if(resizable_flag){
-			continue_flag = false;
-			if(SIGWINCH_flag){
-				int cur_y = getcury(stdscr);
-				// endwin();
-				// initialize_window();
-				clr_full();
-				print_menu();
-				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-				move(cur_y,get_cur_x(CUR_X_TEXT));
-				refresh();
-			}
-			continue_flag = true;
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
+// void check_and_resize(const std::list<std::string>& text){
+// 	while(!exit_flag){
+// 		if(resizable_flag){
+// 			continue_flag = false;
+// 			if(SIGWINCH_flag){
+// 				int cur_y = getcury(stdscr);
+// 				endwin();
+// 				initialize_window();
+// 				int max_y = max_y_text_area();
+// 				if(cur_y > max_y){cur_y = max_y;}
+// 				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+// 				move(cur_y,get_cur_x(CUR_X_TEXT));
+// 				refresh();
+// 			}
+// 			continue_flag = true;
+// 		}
+// 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+// 	}
+// 	return;
+// }
+
+void resize(const std::list<std::string>& text){
+	int cur_y = getcury(stdscr);
+	endwin();
+	initialize_window();
+	int max_y = max_y_text_area();
+	if(cur_y > max_y){cur_y = max_y;}
+	render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
+	move(cur_y,get_cur_x(CUR_X_TEXT));
+	refresh();
 	return;
 }
 
-void SIGWINCH_handler(int sig){
-	// if(sig==SIGWINCH){
-	// 	SIGWINCH_flag = true;
-	// }
-	SIGWINCH_flag = true;
-	return;
-}
+// void SIGWINCH_handler(int sig){
+// 	// if(sig==SIGWINCH){
+// 	// 	SIGWINCH_flag = true;
+// 	// }
+// 	SIGWINCH_flag = true;
+// 	return;
+// }

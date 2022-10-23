@@ -10,7 +10,7 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
-#include <signal.h>
+// #include <signal.h>
 
 
 inline int max_lines();
@@ -102,9 +102,11 @@ void key_delchar(std::list<std::string>& text);
 
 // void resize(std::list<std::string>& text);
 
-void check_and_resize(const std::list<std::string>& text);
+// void check_and_resize(const std::list<std::string>& text);
 
-void SIGWINCH_handler(int sig);
+void resize(const std::list<std::string>& text);
+
+// void SIGWINCH_handler(int sig);
 
 
 #endif

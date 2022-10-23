@@ -2,7 +2,7 @@
 
 
 int main(int argc, char** argv){
-	signal(SIGWINCH, SIGWINCH_handler);
+	//signal(SIGWINCH, SIGWINCH_handler);
 	std::string filepath = "";
 	if(argc > 1){
 		filepath = argv[1];
