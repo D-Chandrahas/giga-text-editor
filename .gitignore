@@ -31,9 +31,11 @@
 *.out
 *.app
 
-#pdfs
+# pdfs
 *.pdf
 
-#test folder and files
+# test folder and files
 test/
-test*.*
+
+# my todo file
+/todo.txt

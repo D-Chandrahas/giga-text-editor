@@ -86,7 +86,7 @@ void remove_btn(){
 void write_out(const std::string& filepath,const std::list<std::string>& text){
 	int cur_x, cur_y;
 	getyx(stdscr, cur_y, cur_x);
-	std::string new_filepath = take_inp("Enter Filename: ",filepath,32,126,100);
+	std::string new_filepath = take_inp("Enter Filepath: ",filepath,32,126,100);
 	if((new_filepath != CANCEL_CODE) and (new_filepath != "")){
 		if(!writefile(new_filepath, text)){
 			ctn_btn("Failed to Write File...");
