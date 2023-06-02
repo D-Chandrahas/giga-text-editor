@@ -1,0 +1,4 @@
+extra new line on each open/close (bug)
+save changes prompt for exit and open file
+open file - auto create new file if not exists?
+new file option
