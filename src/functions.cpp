@@ -196,8 +196,12 @@ void readfile(const std::string& filepath, std::list<std::string>& text){
 		return;
 	}
 	std::string line;
-	while(!ifile.eof()){
+	while(true){
 		std::getline(ifile,line);
+		if(ifile.eof()){
+			text.push_back(line);
+			break;
+		}
 		line.push_back('\n');
 		text.push_back(line);
 	}
@@ -346,7 +350,8 @@ void key_up(const std::list<std::string>& text){
 	CUR_Y_TEXT--;
 	auto it = std::next(text.begin(),CUR_Y_TEXT);
 	if(CUR_X_TEXT > it->length()-1){
-		CUR_X_TEXT = it->length()-1;
+		if(CUR_Y_TEXT == text.size()-1){CUR_X_TEXT = it->length();}
+		else{CUR_X_TEXT = it->length()-1;}
 	}
 	if(cur_y == 0){
 		render_full(text,CUR_Y_TEXT,scr_x_state(CUR_X_TEXT));
@@ -367,7 +372,8 @@ void key_down(const std::list<std::string>& text){
 	CUR_Y_TEXT++;
 	auto it = std::next(text.begin(),CUR_Y_TEXT);
 	if(CUR_X_TEXT > it->length()-1){
-		CUR_X_TEXT = it->length()-1;
+		if(CUR_Y_TEXT == text.size()-1){CUR_X_TEXT = it->length();}
+		else{CUR_X_TEXT = it->length()-1;}
 	}
 	int maxytextarea = max_y_text_area();
 	if(cur_y == maxytextarea){
@@ -406,7 +412,7 @@ void key_left(const std::list<std::string>& text){
 
 void key_right(const std::list<std::string>& text){
 	auto it = std::next(text.begin(),CUR_Y_TEXT);
-	if((CUR_X_TEXT + 1 >= (it->length())) and (CUR_Y_TEXT + 1 >= (text.size()))){return;}
+	if((CUR_X_TEXT >= (it->length())) and (CUR_Y_TEXT + 1 >= (text.size()))){return;}
 	if((CUR_X_TEXT + 1 >= (it->length())) and (CUR_Y_TEXT + 1 < (text.size()))){
 		CUR_X_TEXT = 0;
 		key_down(text);

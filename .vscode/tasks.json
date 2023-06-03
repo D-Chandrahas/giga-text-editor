@@ -12,9 +12,9 @@
                 "-D_POSIX_C_SOURCE=199506L",
                 "-IC:/msys64/mingw64/bin/../include/ncursesw",
                 //"${file}",
-                "${fileDirname}\\*.cpp",
+                "${workspaceFolder}/src/*.cpp",
                 "-o",
-                "${fileDirname}\\..\\bin\\${fileBasenameNoExtension}.exe",
+                "${workspaceFolder}/bin/giga.exe",
                 "-lncursesw",
                 "-lsystre",
                 "-ltre",
@@ -22,7 +22,7 @@
                 "-liconv"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"
