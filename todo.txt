@@ -1,4 +1,5 @@
-extra new line on each open/close (bug)
+critically scrutinize arrow keys, enter and backspace keys and make them independent
+optimise rendering in key_up() and key_down()
 save changes prompt for exit and open file
 open file - auto create new file if not exists?
 new file option
