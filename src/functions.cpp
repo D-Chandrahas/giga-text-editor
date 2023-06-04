@@ -287,7 +287,7 @@ bool restart_program(std::string& filepath){
 	if(filepath != ""){
 		readfile(filepath,text);
 	}
-	else{text.push_back("\n");} // ?? why
+	else{text.push_back("");}
 	render_full(text,0,0);
 	move(0,0);
 	// exit_flag = false;
