@@ -277,17 +277,17 @@ void clr_txt_area(){
 // }
 
 bool restart_program(std::string& filepath){
-	std::list<std::string> text;
-	if(filepath != ""){
-		readfile(filepath,text);
-	}
-	else{text.push_back("\n");}
 	int ch;
 	int cur_x = 0;
 	int cur_y = 0;
 	CUR_X_TEXT = 0;
 	CUR_Y_TEXT = 0;
 	initialize_window();
+	std::list<std::string> text;
+	if(filepath != ""){
+		readfile(filepath,text);
+	}
+	else{text.push_back("\n");} // ?? why
 	render_full(text,0,0);
 	move(0,0);
 	// exit_flag = false;
