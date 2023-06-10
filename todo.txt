@@ -3,3 +3,4 @@ optimise rendering in key_up() and key_down()
 save changes prompt for exit and open file
 open file - auto create new file if not exists?
 new file option
+info about arrow keys, del, backspace, resize etc in readme
