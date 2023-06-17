@@ -2,7 +2,7 @@
 #define MAIN_HEADER_HPP
 
 
-#include <csignal>
+// #include <csignal>
 #include <ncurses.h>
 #include <string>
 #include <fstream>
