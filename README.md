@@ -6,7 +6,7 @@
 - `g++ -O3 *.cpp -o ../bin/giga $(pkg-config ncursesw --cflags --libs)`
 - `cd ../bin`
 - you can find the compiled binary in `giga-text-editor/bin`
-- (optional) make it globally accesible with `sudo cp giga /usr/local/bin`
+- (optional) make it globally accesible with `sudo cp giga /usr/local/bin/`
 
 ## Usage
 ```
