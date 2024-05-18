@@ -1,6 +1,6 @@
-## Build instructions for ubuntu
+## Build instructions for ubuntu 23.10
 - `sudo apt update`
-- `sudo apt install libncursesw5-dev pkg-config`
+- `sudo apt install libncursesw6 pkg-config`
 - `git clone https://github.com/D-Chandrahas/giga-text-editor`
 - `cd giga-text-editor/src`
 - `g++ -O3 *.cpp -o ../bin/giga $(pkg-config ncursesw --cflags --libs)`
