@@ -1,10 +1,10 @@
 #include "main_header.hpp"
 
 
-// static std::atomic<bool> exit_flag = false;
-// static std::atomic<bool> resizable_flag = false;
-// static std::atomic<bool> continue_flag = true;
-// static std::atomic<bool> SIGWINCH_flag = false;
+static std::atomic<bool> exit_children = false;
+static std::atomic<bool> main_paused = false;
+static std::atomic<bool> pause_main = false;
+static std::atomic<bool> SIGWINCH_flag = false;
 
 
 static const char CANCEL_CODE[2] = {char(3),'\0'};
@@ -290,23 +290,24 @@ bool restart_program(std::string& filepath){
 	else{text.push_back("");}
 	render_full(text,0,0);
 	move(0,0);
-	// exit_flag = false;
-	// std::thread resize_event_listener(check_and_resize,std::ref(text));
+	std::thread win_resize_thread(check_and_resize,std::ref(text));
 
 	while(TRUE){
-		// resizable_flag = true;
+		main_paused = true;
 		ch = getch();
-		// resizable_flag = false;
 
-		// while(!continue_flag){
-		// 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		// }
+		if (pause_main){
+			while(pause_main){
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+		}
+		main_paused = false;
 		
-		if(ch == CTRL('X')){endwin();/*exit_flag = true;resize_event_listener.join();*/return false;}
+		if(ch == CTRL('X')){endwin(); exit_children = true; win_resize_thread.join(); return false;}
 		if(ch == CTRL('W')){write_out(filepath,text);continue;}
 		if(ch == CTRL('G')){goto_line(text);continue;}
 		if(ch == CTRL('O')){
-			if(open_file(filepath)){endwin();/*exit_flag = true;resize_event_listener.join();*/return true;}
+			if(open_file(filepath)){endwin(); exit_children = true; win_resize_thread.join(); return true;}
 			else{continue;}
 		}
 		if(ch == KEY_UP){key_up(text);continue;}
@@ -317,7 +318,7 @@ bool restart_program(std::string& filepath){
 		if(ch >= 32 and ch <= 126){key_char(text,ch);continue;}
 		if(ch == KEY_BACKSPACE or ch == '\b'){key_backspace(text);continue;}
 		if(ch == KEY_DC or ch == 127){key_delchar(text);continue;}
-		if(ch == KEY_RESIZE){resize(text);continue;}
+		// // if(ch == KEY_RESIZE){resize(text);continue;}
 		refresh();
 	}
 }
@@ -504,26 +505,24 @@ void key_delchar(std::list<std::string>& text){
 	return;
 }
 
-// void check_and_resize(const std::list<std::string>& text){
-// 	while(!exit_flag){
-// 		if(resizable_flag){
-// 			continue_flag = false;
-// 			if(SIGWINCH_flag){
-// 				int cur_y = getcury(stdscr);
-// 				endwin();
-// 				initialize_window();
-// 				int max_y = max_y_text_area();
-// 				if(cur_y > max_y){cur_y = max_y;}
-// 				render_full(text,scr_y_state(CUR_Y_TEXT,cur_y),scr_x_state(CUR_X_TEXT));
-// 				move(cur_y,get_cur_x(CUR_X_TEXT));
-// 				refresh();
-// 			}
-// 			continue_flag = true;
-// 		}
-// 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-// 	}
-// 	return;
-// }
+void check_and_resize(const std::list<std::string>& text){
+	int prev_max_lines = max_lines(), prev_max_cols = max_cols(), curr_max_lines, curr_max_cols; //
+	while(!exit_children){
+		curr_max_lines = max_lines(), curr_max_cols = max_cols(); //
+		// if (SIGWINCH_flag){
+		if (curr_max_lines != prev_max_lines or curr_max_cols != prev_max_cols){ //
+			pause_main = true;
+			while(!main_paused){
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+			resize(text);
+			prev_max_lines = curr_max_lines, prev_max_cols = curr_max_cols; //
+			pause_main = false;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+	return;
+}
 
 void resize(const std::list<std::string>& text){
 	int cur_y = getcury(stdscr);

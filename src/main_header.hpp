@@ -7,9 +7,9 @@
 #include <string>
 #include <fstream>
 #include <list>
-// #include <thread>
-// #include <atomic>
-// #include <chrono>
+#include <thread>
+#include <atomic>
+#include <chrono>
 // #include <signal.h>
 
 
@@ -80,7 +80,7 @@ bool open_file(std::string& filepath);
 
 int scr_x_state(int x_text);
 
-inline int scr_y_state(int y_text);
+inline int scr_y_state(int y_text,int y);
 
 int get_cur_x(int x_text);
 
@@ -100,7 +100,7 @@ void key_backspace(std::list<std::string>& text);
 
 void key_delchar(std::list<std::string>& text);
 
-// void check_and_resize(const std::list<std::string>& text);
+void check_and_resize(const std::list<std::string>& text);
 
 void resize(const std::list<std::string>& text);
 
